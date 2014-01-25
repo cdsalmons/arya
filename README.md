@@ -2,7 +2,7 @@
 
 Arya is a minimalist PHP web SAPI framework providing URI routing, dependency injection and
 middleware hooks. The framework leverages HTTP protocol adherence and S.O.L.I.D design principles to
-maximize flexibility while maintaining the simplicity and performance.
+maximize flexibility while maintaining simplicity and performance.
 
 > **WARNING:** Arya is still under development and there is very little unit-testing present at
 > the moment. Use at your own risk.
@@ -24,16 +24,16 @@ $app = (new Arya\Application)
 
 **Project Goals**
 
-- Model code closely to the HTTP/1.1 protocol as outlined in RFC 2616;
+- Model code on the HTTP/1.1 protocol as outlined in RFC 2616;
 - Build components using SOLID, readable and well-tested code;
 - Prevent vendor lock-in and static coupling;
 - Minimize performance overhead.
 
 ## Requirements and Installation
 
-- PHP >= 5.3
-- [Auryn](https://github.com/rdlowrey/Auryn) For automated dependency injection
-- [Artax](https://github.com/rdlowrey/Artax) Only needed to run tests
+- PHP (5.3+)
+- [Auryn](https://github.com/rdlowrey/Auryn) For: automated dependency injection
+- [Artax](https://github.com/rdlowrey/Artax) For: running automated tests
 
 **Github**
 
@@ -50,8 +50,15 @@ $ git clone --recursive git://github.com/rdlowrey/Arya.git
 
 **Manual Download**
 
-Archived tagged release versions are also available for manual download on the project
-[tags page](https://github.com/rdlowrey/Arya/tags)
+Archived tagged release versions are also available (or will be) for manual download on the project
+[tags page](https://github.com/rdlowrey/Arya/tags).
+
+## Contributions
+
+Contributions in the form of pull requests (PRs) are always appreciated! Before submitting a PR
+please read the [CONTRIBUTORS][contributors] file.
+
+[contributors]: https://github.com/rdlowrey/Arya/blob/master/CONTRIBUTORS "CONTRIBUTORS"
 
 ## The Guide
 
