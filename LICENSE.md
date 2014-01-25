@@ -1,4 +1,4 @@
-The MIT License (MIT)
+# The MIT License (MIT)
 
 Copyright (c) 2014 Daniel Lowrey and other contributors (see the CONTRIBUTORS file).
 
