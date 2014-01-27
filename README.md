@@ -1,23 +1,25 @@
 # Arya
 
 Arya is a minimalist PHP web SAPI framework providing URI routing, dependency injection and
-middleware hooks. The framework leverages HTTP protocol adherence and S.O.L.I.D design principles to
+middleware hooks. The framework leverages HTTP protocol adherence and SOLID design principles to
 maximize flexibility while maintaining simplicity and performance.
 
 > **WARNING:** Arya is still under development and there is very little unit-testing present at
-> the moment. The project is moving towards an official v0.1.0 release but has not yet reached a
-> release point. Code may change at any time and without warning. Use at your own risk.
+> the moment. The project is moving towards an official v0.1.0 release but has not yet reached
+> that point. Code may change at any time and without warning. Use at your own risk.
 
 **Basic Example**
 
 ```php
 <?php
 $app = (new Arya\Application)
+    ->before(function($request) {...}) // <-- middleware before request handled
     ->route('GET', '/', 'anyFunction')
     ->route('GET', '/lambda', $anyClosure)
     ->route('GET', '/static', 'AnyClass::staticMethod')
     ->route('GET', '/instance', 'AnyClass::instanceMethod') // <-- auto dependency injection
     ->route('GET', '/args/$#arg1/$#arg2', 'numericArgsFunction')
+    ->after(function($request, $response) { ... }) // <-- middleware before response sent
     ->run()
 ;
 ```
@@ -36,8 +38,8 @@ $app = (new Arya\Application)
 - [Auryn](https://github.com/rdlowrey/Auryn) for: automated dependency injection
 - [Artax](https://github.com/rdlowrey/Artax) for: running automated tests
 
-> **NOTE:** Artax requires PHP 5.4+, however it is only used for running tests in development. All
-> library code is expected to work in PHP 5.3+ environments.
+> **NOTE:** Artax requires PHP 5.4+, however the Artax library is only used for running test suites.
+> All library code is expected to work in PHP 5.3+ production environments.
 
 **Github**
 
@@ -131,6 +133,9 @@ $app = (new Arya\Application)
 ;
 ```
 
+Routes are matched in the order in which they are assigned with the caveat that routes *without*
+arguments always take precedence over routes *with* arguments (see (Route Arguments)[#route-arguments]).
+
 ### Extended Route Targets
 
 You'll notice that in the above example code there's special attention paid to the final route,
@@ -164,7 +169,7 @@ $app = (new Arya\Application)->route('GET', '/', 'MyClass::get')->run();
 > **IMPORTANT:** Arya also recursively injects any dependencies you typehint in your controller
 > method signatures. In the above example we use constructor injection to provide the `Templater`
 > object that renders our HTML response. However, we could have alternatively typehinted the
-> `Templater` in our `MyClass::get` method signature and injected it there.
+> `Templater` in our `MyClass::get` method signature and injected it at call time.
 
 ### Route Arguments
 
@@ -223,16 +228,75 @@ Every client request follows one of three paths through the routing system:
 
 
 ## Middleware
-@TODO
+
+One of Arya's goals is to retain PHP's ease of use while still exposing a standard API for
+middleware modification before and after each request.
+
+**Middleware Quick and Dirty**
+
+- Arya uses universal `Arya\Request` and `Arya\Response` instances for each page load;
+- Middleware may modify the universal request/response instances before or after route handlers;
+- Middleware MUST return `TRUE/FALSE/NULL` and may only modify the request/response directly;
+- If a middleware returns `TRUE` then no more middleware of the same type (before/after/final) will
+  execute;
+- "Before" middleware should *only* return `TRUE` if it assigns a response as Arya will treat this
+  result as an indication that the route handler should not be invoked;
+- "After" middleware will always execute after "before" middleware and/or the routed application
+  handler;
+- @TODO Mention "Final" middleware (not yet operational)
+
 
 ### Before
-@TODO
+
+@TODO Add URL rewriting example
+
 
 ### After
-@TODO
+
+The middleware concept is just as powerful for modifying responses after they're generated as it is
+for altering requests before they reach the application. Let's consider a standard use-case for an
+"after" middleware ...
+
+##### Custom Error Pages
+
+Arya provides no *built-in* abstraction for custom error pages because the middleware system exposes
+all the necessary tools for a manual implementation. Let's say we want to capture all error
+responses and replace them with our own custom error page. All we need to do is specify an "after"
+middleware callable to capture and modify such responses before they're sent to the client ...
+
+```php
+<?php
+use Arya\Response, Arya\Application;
+
+function myErrorPageMiddleware(Response $response) {
+    switch ($response->getStatus()) {
+        case 404:
+            $response->setBody('my custom 404 html');
+            break;
+        case 500:
+            $response->setBody('my custom 500 html');
+            break;
+        default:
+            // don't bother to modify any others
+    }
+}
+
+(new Application)
+    ->route('GET', '/', function() { return 'Hello World'; })
+    ->after('myErrorPageMiddleware')
+    ->run();
+```
+
+What's going on in this example? All we've done is register a middleware class method to be invoked
+after the application executes. Our `myErrorPageMiddleware` function simply checks to see if
+specific status codes were assigned and if so replaces the response entity body with our own custom
+HTML. Note that middleware callables are provisioned in the same way as applications; all we
+need to do is typehint our dependencies and they'll be provided automatically either in the
+constructor or callable signature (wherever the middleware asks for them).
+
 
 ### Finalize
-@TODO
+@TODO "Final" middleware not yet operational
 
 
 
