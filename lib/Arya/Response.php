@@ -208,6 +208,21 @@ class Response implements \ArrayAccess {
     }
 
     /**
+     * Append multiple raw header lines of the form "Some-Header-Field: my value"
+     *
+     * @param array $lines
+     * @throws \InvalidArgumentException
+     * @return Response Returns the current object instance
+     */
+    public function addAllHeaderLines(array $lines) {
+        foreach ($lines as $line) {
+            $this->addHeaderLine($line);
+        }
+
+        return $this;
+    }
+
+    /**
      * Appends a raw header line of the form "Some-Header-Field: my value"
      *
      * The header's value is appended to existing headers with the same field name.
@@ -524,16 +539,75 @@ class Response implements \ArrayAccess {
         return isset($this->body);
     }
 
+    /**
+     * Import values from external Response instance
+     *
+     * Calling import() will clear all previously assigned values before assigning those from the
+     * new Response instance.
+     *
+     * @param \Arya\Response $response
+     * @return Response Returns the current object instance
+     */
+    public function import(Response $response) {
+        $this->clear();
+        foreach ($response->toArray() as $key => $value) {
+            $this->offsetSet($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     */
+    public function importArray(array $response) {
+        $this->clear();
+        foreach ($response as $key => $value) {
+            $this->offsetSet($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     */
+    public function toArray() {
+        return array_merge(array(
+            'status' => $this->status,
+            'reason' => $this->reasonPhrase,
+            'headers' => $this->getAllHeaderLines(),
+            'body' => $this->body
+        ), $this->asgiMap);
+    }
+
+    /**
+     * Remove all assigned values and reset defaults
+     *
+     * @return Response Returns the current object instance
+     */
+    public function clear() {
+        $this->status = 200;
+        $this->reasonPhrase = '';
+        $this->headers = array();
+        $this->ucHeaders = array();
+        $this->cookies = array();
+        $this->body = NULL;
+        $this->asgiMap = array();
+
+        return $this;
+    }
+
     public function offsetSet($offset, $value) {
         switch ($offset) {
             case 'status':
                 $this->setStatus($value);
                 break;
             case 'reason':
-                $this->setReason($value);
+                $this->setReasonPhrase($value);
                 break;
             case 'headers':
-                $this->setAllHeaderLines($value);
+                $this->addAllHeaderLines($value);
                 break;
             case 'body':
                 $this->setBody($value);

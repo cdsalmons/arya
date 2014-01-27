@@ -125,14 +125,22 @@ class Application {
     /**
      * Respond to client requests
      *
+     * The run method allows users to inject their own Arya\Request instance (which can be useful
+     * for testing). Most use-cases should leave the parameter unassigned as Arya will auto-generate
+     * the request automatically if not specified.
+     *
      * @param array $request The request environment
      * @return void
      */
     public function run(Request $request = NULL) {
         $request = $request ?: $this->generateRequest();
+        $response = new Response;
 
         $this->request = $request;
+        $this->response = $response;
+
         $this->injector->share($request);
+        $this->injector->share($response);
         $this->injector->share('Arya\Sessions\SessionMiddlewareProxy');
         $this->injector->alias('Arya\Sessions\Session', 'Arya\Sessions\SessionMiddlewareProxy');
         $this->injector->define('Arya\Sessions\SessionMiddlewareProxy', array(
@@ -145,8 +153,10 @@ class Application {
         $middlewareSort = [$this, 'middlewareSort'];
         usort($this->befores, $middlewareSort);
 
-        if (!$response = $this->doBefores($request)) {
-            $response = $this->routeRequest($request);
+        ob_start();
+
+        if (!$this->doMiddleware($this->befores)) {
+            $this->routeRequest();
         }
 
         // We specifically sort these after handler invocation so that session middleware
@@ -156,19 +166,20 @@ class Application {
         usort($this->afters, $middlewareSort);
         usort($this->finalizers, $middlewareSort);
 
-        $this->response = $this->doAfters($request, $response);
+        $this->doMiddleware($this->afters);
 
         $bufferedOutput = ob_get_clean();
+
         if (isset($bufferedOutput[0])) {
-            $this->response = $this->generateOutputErrorResponse($bufferedOutput);
+            $this->applyOutputErrorResponse($bufferedOutput);
         }
 
-        $this->sendResponse($this->response);
+        $this->sendResponse();
     }
 
     private function generateRequest() {
-        $input = !empty($_SERVER['CONTENT-LENGTH']) ? fopen('php://input', 'r') : NULL;
-        $request = new Request($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE, $input);
+        $_input = !empty($_SERVER['CONTENT-LENGTH']) ? fopen('php://input', 'r') : NULL;
+        $request = new Request($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE, $_input);
 
         unset($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE);
 
@@ -188,49 +199,30 @@ class Application {
         return $result;
     }
 
-    private function doBefores($request) {
-        $result = NULL;
-
-        foreach ($this->befores as $middlewareArray) {
-            $result = $this->applyBefore($middlewareArray, $request);
-            if (!isset($result)) {
-                continue;
-            } elseif ($result instanceof Response) {
-                break;
-            } else {
-                $result = $this->assignPrimitiveBeforeMiddlewareResponse($result);
+    private function doMiddleware(array $middleware) {
+        $shouldStop = FALSE;
+        foreach ($middleware as $middlewareStruct) {
+            if ($this->applyMiddleware($middlewareStruct)) {
+                $shouldStop = TRUE;
                 break;
             }
         }
 
-        return $result;
+        return $shouldStop;
     }
 
-    private function assignPrimitiveBeforeMiddlewareResponse($result) {
-        try {
-            $response = new Response;
-            $response->setBody($result);
-        } catch (\InvalidArgumentException $e) {
-            $response = $this->generateExceptionResponse(new \LogicException(
-                sprintf('"before" middleware returned invalid type: %s', gettype($result))
-            ));
-        }
+    private function applyMiddleware(array $middlewareStruct) {
+        list($executableMiddleware, $methodFilter, $uriFilter) = $middlewareStruct;
 
-        return $response;
-    }
-
-    private function applyBefore(array $middlewareArray, Request $request) {
-        list($middleware, $methodFilter, $uriFilter) = $middlewareArray;
-
-        if ($methodFilter && $request['REQUEST_METHOD'] !== $methodFilter) {
-            $result = NULL;
-        } elseif ($uriFilter && !$this->matchesUriFilter($uriFilter, $request['REQUEST_URI'])) {
-            $result = NULL;
+        if ($methodFilter && $this->request['REQUEST_METHOD'] !== $methodFilter) {
+            $shouldStop = FALSE;
+        } elseif ($uriFilter && !$this->matchesUriFilter($uriFilter, $this->request['REQUEST_URI'])) {
+            $shouldStop = FALSE;
         } else {
-            $result = $this->tryBefore($middleware, $request);
+            $shouldStop = $this->tryMiddleware($executableMiddleware);
         }
 
-        return $result;
+        return $shouldStop;
     }
 
     private function matchesUriFilter($uriFilter, $uriPath) {
@@ -247,35 +239,43 @@ class Application {
         return $isMatch;
     }
 
-    private function tryBefore($middleware, Request $request) {
+    private function tryMiddleware($executableMiddleware) {
         try {
-            $result = $this->injector->execute($middleware, array(
-                ':request' => $request
+            $shouldStop = $this->injector->execute($executableMiddleware, array(
+                ':request' => $this->request,
+                ':response' => $this->response,
             ));
-        } catch (InjectionException $e) {
-            $result = $this->generateExceptionResponse(new \RuntimeException(
-                $msg = '"Before" middleware injection failure',
+
+            if ($shouldStop && $shouldStop !== TRUE) {
+                throw new \RuntimeException(
+                    sprintf('Middleware returned invalid type: %s', gettype($shouldStop))
+                );
+            }
+
+        } catch (InjectionException $error) {
+            $shouldStop = TRUE;
+            $this->applyExceptionResponse(new \RuntimeException(
+                $msg = 'Middleware injection failure',
                 $code = 0,
-                $prev = $e
+                $error
             ));
-        } catch (\Exception $e) {
-            $result = $this->generateExceptionResponse(new \RuntimeException(
-                $msg = '"Before" middleware execution threw an uncaught exception',
+        } catch (\Exception $error) {
+            $shouldStop = TRUE;
+            $this->applyExceptionResponse(new \RuntimeException(
+                $msg = 'Middleware execution threw an uncaught exception',
                 $code = 0,
-                $prev = $e
+                $error
             ));
         }
 
-        return $result;
+        return $shouldStop;
     }
 
-    private function generateExceptionResponse(\Exception $e) {
-        $response = new Response;
-        $response->setStatus(Status::INTERNAL_SERVER_ERROR);
-        $response->setReasonPhrase(Reason::HTTP_500);
-        $response->setBody($this->generateExceptionBody($e));
-
-        return $response;
+    private function applyExceptionResponse(\Exception $e) {
+        $this->response->importArray(array(
+            'status' => 500,
+            'body' => $this->generateExceptionBody($e)
+        ));
     }
 
     private function generateExceptionBody(\Exception $e) {
@@ -286,180 +286,120 @@ class Application {
         return "<html><body><h1>500 Internal Server Error</h1><hr/>{$msg}</body></html>";
     }
 
-    private function generateOutputErrorResponse($buffer) {
-        $response = new Response;
-        $response->setStatus(Status::INTERNAL_SERVER_ERROR);
-        $response->setReasonPhrase(Reason::HTTP_500);
-
+    private function applyOutputErrorResponse($buffer) {
         $msg = $this->options['app.debug']
             ? "<pre style=\"color:red\">{$buffer}</pre>"
             : '<p>Something went terribly wrong!</p>';
 
         $body = "<html><body><h1>500 Internal Server Error</h1><hr/>{$msg}</body></html>";
 
-        $response->setBody($body);
-
-        return $response;
+        $this->response->importArray(array(
+            'status' => 500,
+            'body' => $body
+        ));
     }
 
-    private function routeRequest(Request $request, $forceMethod = NULL) {
+    private function routeRequest($forceMethod = NULL) {
         try {
+            $request = $this->request;
             $method = $forceMethod ?: $request['REQUEST_METHOD'];
             $uriPath = $request['REQUEST_URI_PATH'];
             list($routeHandler, $routeArgs) = $this->router->route($method, $uriPath);
 
             $request['ROUTE_ARGS'] = $routeArgs;
-            $argLiterals = array(
-                ':request' => $request
+            $paramLiterals = array(
+                ':request' => $request,
+                ':response' => $this->response
             );
 
             if ($routeArgs) {
                 foreach ($routeArgs as $key => $value) {
-                    $argLiterals[":{$key}"] = $value;
+                    $paramLiterals[":{$key}"] = $value;
                 }
             }
 
-            $result = $this->injector->execute($routeHandler, $argLiterals);
+            $result = $this->injector->execute($routeHandler, $paramLiterals);
 
             if ($result instanceof Response) {
-                $response = $result;
+                $this->response->import($result);
             } elseif (is_array($result)) {
-                $response = new Response;
-                $response->populateFromAsgiMap($result);
+                $this->response->importArray($result);
             } else {
-                $response = new Response;
-                $response->setBody($result);
-                $this->validateEmptyPrimitiveResponse($response);
+                $this->response->setBody($result);
             }
         } catch (NotFoundException $e) {
-            $response = $this->generateNotFoundResponse();
+            $this->applyNotFoundResponse();
         } catch (MethodNotAllowedException $e) {
             if ($method === 'HEAD') {
-                $response = $this->routeRequest($request, $forceMethod = 'GET');
+                $this->routeRequest($forceMethod = 'GET');
             } else {
                 $allowedMethods = $e->getAllowedMethods();
-                $response = $this->generateMethodNotAllowedResponse($allowedMethods);
+                $this->applyMethodNotAllowedResponse($allowedMethods);
             }
         } catch (InjectionException $e) {
-            $response = $this->generateExceptionResponse(new \RuntimeException(
+            $this->applyExceptionResponse(new \RuntimeException(
                 $msg = 'Route handler injection failure',
                 $code = 0,
                 $prev = $e
             ));
         } catch (\Exception $e) {
-            $response = $this->generateExceptionResponse($e);
-        }
-
-        return $response;
-    }
-
-    private function validateEmptyPrimitiveResponse(Response $response) {
-        if (!($this->options['app.allow_empty_response'] || ($body = $response->getBody()) || $body === '0')) {
-            throw new \LogicException(
-                'Empty primitive response'
-            );
+            $this->applyExceptionResponse($e);
         }
     }
 
-    private function generateNotFoundResponse() {
-        $response = new Response;
-        $response->setStatus(Status::NOT_FOUND);
-        $response->setReasonPhrase(Reason::HTTP_404);
-        $response->setBody('<html><body><h1>404 Not Found</h1></body></html>');
-
-        return $response;
+    private function applyNotFoundResponse() {
+        $this->response->importArray(array(
+            'status' => 404,
+            'body' => '<html><body><h1>404 Not Found</h1></body></html>'
+        ));
     }
 
-    private function generateMethodNotAllowedResponse(array $allowedMethods) {
-        $response = new Response;
-        $response->setStatus(Status::METHOD_NOT_ALLOWED);
-        $response->setReasonPhrase(Reason::HTTP_405);
-        $response->setHeader('Allow', implode(',', $allowedMethods));
-        $response->setBody('<html><body><h1>405 Method Not Allowed</h1></body></html>');
-
-        return $response;
+    private function applyMethodNotAllowedResponse(array $allowedMethods) {
+        $this->response->importArray(array(
+            'status' => 405,
+            'headers' => array('Allow: ' . implode(',', $allowedMethods)),
+            'body' => '<html><body><h1>405 Method Not Allowed</h1></body></html>'
+        ));
     }
 
-    private function doAfters(Request $request, Response $response) {
-        foreach ($this->afters as $middlewareArray) {
-            if ($errorResponse = $this->applyAfter($middlewareArray, $request, $response)) {
-                $response = $errorResponse;
-                break;
-            }
-        }
-
-        return $response;
-    }
-
-    private function applyAfter(array $middlewareArray, Request $request, Response $response) {
-        list($middleware, $methodFilter, $uriFilter) = $middlewareArray;
-
-        if ($methodFilter && $request['REQUEST_METHOD'] !== $methodFilter) {
-            $result = NULL;
-        } elseif ($uriFilter && !$this->matchesUriFilter($uriFilter, $request['REQUEST_URI_PATH'])) {
-            $result = NULL;
-        } else {
-            $result = $this->tryAfter($middleware, $request, $response);
-        }
-
-        return $result;
-    }
-
-    private function tryAfter($middleware, Request $request, Response $response) {
-        try {
-            $this->injector->execute($middleware, array(
-                ':request' => $request,
-                ':response' => $response
-            ));
-        } catch (\Exception $e) {
-            return $this->generateExceptionResponse($e);
-        }
-    }
-
-    private function sendResponse(Response $response) {
-        $statusCode = $response->getStatus();
-
+    private function sendResponse() {
+        // @TODO Decide if headers assigned with header() should
+        // actually be retained (probably not).
         if ($nativeHeaders = headers_list()) {
             foreach ($nativeHeaders as $line) {
-                $response->addHeaderLine($line);
+                $this->response->addHeaderLine($line);
             }
         }
 
-        if ($this->options['app.auto_reason'] && !$response->getReasonPhrase()) {
+        $statusCode = $this->response->getStatus();
+        $reason = $this->response->getReasonPhrase();
+        if ($this->options['app.auto_reason'] && empty($reason)) {
             $reasonConstant = "Arya\Reason::HTTP_{$statusCode}";
             $reason = defined($reasonConstant) ? constant($reasonConstant) : '';
-            $response->setReasonPhrase($reason);
+            $this->response->setReasonPhrase($reason);
         }
 
-        $protocol = $this->request['SERVER_PROTOCOL'];
-        $statusLine = $this->generateResponseStatusLine($response, $protocol);
+        $statusLine = sprintf("HTTP/%s %s", $this->request['SERVER_PROTOCOL'], $statusCode);
+        if (isset($reason[0])) {
+            $statusLine .= " {$reason}";
+        }
 
         header_remove();
         header($statusLine);
 
-        foreach ($response->getAllHeaderLines() as $headerLine) {
+        foreach ($this->response->getAllHeaderLines() as $headerLine) {
             header($headerLine, $replace = FALSE);
         }
 
-        $body = $response->getBody();
+        flush(); // Force header output
+
+        $body = $this->response->getBody();
 
         if (is_string($body)) {
             echo $body;
         } elseif (is_callable($body)) {
             $this->outputCallableBody($body);
         }
-    }
-
-    private function generateResponseStatusLine(Response $response, $protocol) {
-        $status = $response->getStatus();
-        $reason = $response->getReasonPhrase();
-        $statusLine = "HTTP/{$protocol} {$status}";
-
-        if (isset($reason[0])) {
-            $statusLine .= " {$reason}";
-        }
-
-        return $statusLine;
     }
 
     private function outputCallableBody(callable $body) {
@@ -476,22 +416,6 @@ class Application {
             $protocol = $this->request['SERVER_PROTOCOL'];
             header("HTTP/{$protocol} 500 Internal Server Error");
             echo $this->generateExceptionBody($e);
-        }
-    }
-
-    private function shutdownHandler() {
-        $fatals = array(E_ERROR, E_PARSE, E_USER_ERROR, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING);
-        $lastError = error_get_last();
-
-        if ($lastError && in_array($lastError['type'], $fatals)) {
-            extract($lastError);
-            $this->outputManualExceptionResponse(new \RuntimeException(
-                sprintf("Fatal error: %s in %s on line %d", $message, $file, $line)
-            ));
-        }
-
-        foreach ($this->finalizers as $middlewareArray) {
-            $this->applyFinalizers($middlewareArray[0]);
         }
     }
 
