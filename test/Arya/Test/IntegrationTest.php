@@ -61,7 +61,10 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $response = self::$client->request($uri);
         $this->assertEquals('arg1 | arg2 | 42 | arg1 | arg2 | 42', $response->getBody());
     }
-    
+
+    /**
+     * @requires PHP 5.4
+     */
     public function testRouteArgsUrlDecodedByDefault() {
         $uri = self::$baseUri . '/arg1/%3Ctest%3E/42';
         $response = self::$client->request($uri);
@@ -139,13 +142,13 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $response = self::$client->request($uri);
         $this->assertFalse($response->hasHeader('X-Zanzibar'));
     }
-    
+
     public function testFatalRouteTarget() {
         $uri = self::$baseUri . '/fatal';
         $response = self::$client->request($uri);
         $this->assertEquals(500, $response->getStatus());
     }
-    
+
     public function testExceptionRouteTarget() {
         $uri = self::$baseUri . '/fatal';
         $response = self::$client->request($uri);
