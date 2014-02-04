@@ -44,15 +44,19 @@ class CompositeRegexRouter implements Router {
      */
     public function route($httpMethod, $uri) {
         if (isset($this->staticRoutes[$uri])) {
-            if(isset($this->staticRoutes[$uri][$httpMethod])) {
-                return [$this->staticRoutes[$uri][$httpMethod], []];
-            } else {
-                throw new MethodNotAllowedException(array_keys($this->staticRoutes[$uri]));
-            }
+            return $this->matchStaticRoute($httpMethod, $uri);
         } elseif ($this->compositeRegex) {
             return $this->doCompositeRegexMatch($httpMethod, $uri);
         } else {
             throw new NotFoundException;
+        }
+    }
+
+    private function matchStaticRoute($httpMethod, $uri) {
+        if (isset($this->staticRoutes[$uri][$httpMethod])) {
+            return [$this->staticRoutes[$uri][$httpMethod], []];
+        } else {
+            throw new MethodNotAllowedException(array_keys($this->staticRoutes[$uri]));
         }
     }
 
