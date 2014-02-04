@@ -1,8 +1,8 @@
 <?php
 
-use Artax\Client, Artax\Request;
-
 namespace Arya\Test;
+
+use Artax\Client, Artax\Request;
 
 class IntegrationTest extends \PHPUnit_Framework_TestCase {
 
@@ -155,7 +155,13 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(500, $response->getStatus());
     }
 
-
+    public function testMethodNotAllowedResponseOnUriMatchWithUnroutableMethod() {
+        $uri = self::$baseUri . '/test-function-target';
+        $request = new Request;
+        $request->setUri($uri)->setMethod('POST');
+        $response = self::$client->request($request);
+        $this->assertEquals(405, $response->getStatus());
+    }
 }
 
 
