@@ -90,8 +90,15 @@ class CompositeRegexRouter implements Router {
     }
 
     private function containsVariable($escapedUri) {
-        $varPos = strpos($escapedUri, '$');
-        return $varPos !== FALSE && $escapedUri[$varPos-1] !== '\\';
+        $varPos = 0;
+        
+        while(($varPos = strpos($escapedUri, '$', $varPos + 1)) !== FALSE) {
+            if($escapedUri[$varPos-1] !== '\\') {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private function buildExpressionForRule(Rule $rule) {
