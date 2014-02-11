@@ -164,7 +164,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
     }
     
     public function testFirstDollarEscapedInVariableUri() {
-        $uri = self::$baseUri . '/test/\$arg1/test';
+        $uri = self::$baseUri . '/test/' . urlencode('$arg1') . '/test';
         $response = self::$client->request($uri);
         $this->assertEquals(200, $response->getStatus());
     }
