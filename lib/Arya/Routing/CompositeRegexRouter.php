@@ -86,7 +86,8 @@ class CompositeRegexRouter implements Router {
         $expression = str_replace(
             '\$', '$', preg_quote($string, '~')
         );
-        return str_replace('\\$', '\\\\$', $expression);
+        
+        return str_replace('\\\\$', '\\$', $expression);
     }
 
     private function containsVariable($escapedUri) {
