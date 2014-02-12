@@ -7,7 +7,7 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false"
+         stopOnFailure="true"
          syntaxCheck="false"
          bootstrap="test/bootstrap.php"
         >
@@ -18,7 +18,7 @@
     </testsuites>
 
     <php>
-        <const name="WEB_SERVER_HOST" value="localhost" />
+        <const name="WEB_SERVER_HOST" value="127.0.0.1" />
         <const name="WEB_SERVER_PORT" value="9500" />
         <const name="WEB_SERVER_ROUTER" value="./test/integration_front_controller.php" />
         <!--<const name="WEB_SERVER_DOCROOT" value="./public" />-->
