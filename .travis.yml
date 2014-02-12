@@ -1,0 +1,6 @@
+language: php
+before_install:
+  - git submodule update --init --recursive
+php:
+  - 5.5
+  - 5.4
