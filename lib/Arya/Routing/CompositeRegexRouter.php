@@ -86,12 +86,20 @@ class CompositeRegexRouter implements Router {
         $expression = str_replace(
             '\$', '$', preg_quote($string, '~')
         );
-        return str_replace('\\$', '\\\\$', $expression);
+        
+        return str_replace('\\\\$', '\\$', $expression);
     }
 
     private function containsVariable($escapedUri) {
-        $varPos = strpos($escapedUri, '$');
-        return $varPos !== FALSE && $escapedUri[$varPos-1] !== '\\';
+        $varPos = 0;
+        
+        while(($varPos = strpos($escapedUri, '$', $varPos + 1)) !== FALSE) {
+            if($escapedUri[$varPos-1] !== '\\') {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private function buildExpressionForRule(Rule $rule) {
