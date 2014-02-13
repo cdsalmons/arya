@@ -162,7 +162,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $response = self::$client->request($request);
         $this->assertEquals(405, $response->getStatus());
     }
-    
+
     public function testFirstDollarEscapedInVariableUri() {
         $uri = self::$baseUri . '/test/' . urlencode('$arg1') . '/test';
         $response = self::$client->request($uri);
