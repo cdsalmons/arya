@@ -46,7 +46,7 @@ class Request implements \ArrayAccess, \Iterator {
             }
         }
 
-        $uri = urldecode($_server['REQUEST_URI']);
+        $uri = $_server['REQUEST_URI'];
         $uriPath = parse_url($uri, PHP_URL_PATH);
         $this->vars['REQUEST_URI'] = $uri;
         $this->vars['REQUEST_URI_PATH'] = $uriPath;

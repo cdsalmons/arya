@@ -30,7 +30,7 @@ class Application {
         'app.auto_reason' => TRUE,
         'app.normalize_method_case' => TRUE,
         'app.allow_empty_response' => FALSE,
-        'app.urldecode_uri_args' => TRUE,
+        'app.auto_urldecode' => TRUE,
         'session.class' => 'Arya\Sessions\FileSessionHandler',
         'session.strict' => TRUE,
         'session.cookie_name' => 'ARYASESSID',
@@ -136,6 +136,11 @@ class Application {
     public function run(Request $request = NULL) {
         $request = $request ?: $this->generateRequest();
         $response = new Response;
+
+        if ($this->options['app.auto_urldecode']) {
+            $request['REQUEST_URI'] = urldecode($request['REQUEST_URI']);
+            $request['REQUEST_URI_PATH'] = urldecode($request['REQUEST_URI_PATH']);
+        }
 
         $this->request = $request;
         $this->response = $response;
@@ -306,10 +311,6 @@ class Application {
             $method = $forceMethod ?: $request['REQUEST_METHOD'];
             $uriPath = $request['REQUEST_URI_PATH'];
             list($routeHandler, $routeArgs) = $this->router->route($method, $uriPath);
-
-            if ($routeArgs && $this->options['app.urldecode_uri_args']) {
-                $routeArgs = array_map('urldecode', $routeArgs);
-            }
 
             $request['ROUTE_ARGS'] = $routeArgs;
             $paramLiterals = array(
