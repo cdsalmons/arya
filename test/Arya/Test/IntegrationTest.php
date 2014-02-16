@@ -113,7 +113,12 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(1, $header1);
         $this->assertEquals(2, $header2);
         $this->assertEquals('zanzibar!', $response->getBody());
+    }
 
+    public function testInvalidQueryParameterType() {
+        $uri = self::$baseUri . '/test-invalid-query-parameter-type?arg1[]=value';
+        $response = self::$client->request($uri);
+        $this->assertEquals(400, $response->getStatus());
     }
 
     public function testAppWideBeforeMiddleware() {

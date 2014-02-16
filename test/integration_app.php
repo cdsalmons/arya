@@ -59,6 +59,10 @@ function testComplexResponseFunctionTarget(Request $request) {
     ;
 }
 
+function testInvalidQueryParameterType(Request $request) {
+    return $request->getStringParameter('arg1');
+}
+
 function beforeAll($request) {
     $request['BEFORE_ALL_TEST'] = 42;
 }
@@ -103,6 +107,7 @@ $app = (new Application)
     ->route('GET', '/fatal', 'fatalFunction')
     ->route('GET', '/exception', 'exceptionFunction')
     ->route('GET', '/test/\$arg1/$arg1', 'testFunctionTarget')
+    ->route('GET', '/test-invalid-query-parameter-type', 'testInvalidQueryParameterType')
     ->route('GET', '/test-route-specific-middleware', 'testFunctionTarget')
         ->beforeRoute('beforeSpecific')
         ->afterRoute('afterSpecific')

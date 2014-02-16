@@ -10,6 +10,8 @@ use Auryn\Injector,
     Arya\Routing\Router,
     Arya\Routing\NotFoundException,
     Arya\Routing\MethodNotAllowedException,
+    Arya\Routing\UserInputException,
+    Arya\Routing\InvalidQueryParameterException,
     Arya\Routing\CompositeRegexRouter,
     Arya\Sessions\Session;
 
@@ -342,6 +344,8 @@ class Application {
                 $allowedMethods = $e->getAllowedMethods();
                 $this->applyMethodNotAllowedResponse($allowedMethods);
             }
+        } catch (UserInputException $e) {
+            $this->applyBadRequestResponse();
         } catch (InjectionException $e) {
             $this->applyExceptionResponse(new \RuntimeException(
                 $msg = 'Route handler injection failure',
@@ -365,6 +369,13 @@ class Application {
             'status' => 405,
             'headers' => array('Allow: ' . implode(',', $allowedMethods)),
             'body' => '<html><body><h1>405 Method Not Allowed</h1></body></html>'
+        ));
+    }
+
+    private function applyBadRequestResponse() {
+        $this->response->importArray(array(
+            'status' => 400,
+            'body' => '<html><body><h1>400 Bad Request</h1></body></html>'
         ));
     }
 

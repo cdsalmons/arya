@@ -135,6 +135,30 @@ class Request implements \ArrayAccess, \Iterator {
         }
     }
 
+    public function getArrayParameter($field) {
+        $value = $this->getQueryParameter($field);
+
+        if(is_array($value)) {
+            return $value;
+        } else {
+            throw new Routing\InvalidQueryParameterTypeException(
+                sprintf("Wrong query parameter type: %s", gettype($value))
+            );
+        }
+    }
+
+    public function getStringParameter($field) {
+        $value = $this->getQueryParameter($field);
+
+        if(is_string($value)) {
+            return $value;
+        } else {
+            throw new Routing\InvalidQueryParameterTypeException(
+                sprintf("Wrong query parameter type: %s", gettype($value))
+            );
+        }
+    }
+
     public function getAllQueryParameters() {
         return $this->query;
     }
@@ -149,6 +173,31 @@ class Request implements \ArrayAccess, \Iterator {
         } else {
             throw new \DomainException(
                 sprintf("Unknown form field: %s", $field)
+            );
+        }
+    }
+
+    public function getArrayField($field) {
+        $value = $this->getFormField($field);
+
+        if (is_array($value)) {
+            return $value;
+        } else {
+            throw new Routing\InvalidQueryParameterTypeException(
+                sprintf("Wrong query parameter type: %s", gettype($field))
+            );
+        }
+    }
+
+
+    public function getStringField($field) {
+        $value = $this->getFormField($field);
+
+        if (is_string($value)) {
+            return $value;
+        } else {
+            throw new Routing\InvalidQueryParameterTypeException(
+                sprintf("Wrong query parameter type: %s", gettype($field))
             );
         }
     }
