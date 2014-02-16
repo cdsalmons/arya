@@ -8,6 +8,8 @@ maximize flexibility while maintaining simplicity and performance.
 > the moment. The project is moving towards an official v0.1.0 release but has not yet reached
 > that point. Code may change at any time and without warning. Use at your own risk.
 
+![Travis build https://api.travis-ci.org/rdlowrey/Arya.png?branch=master](https://api.travis-ci.org/rdlowrey/Arya.png?branch=master)
+
 **Basic Example**
 
 ```php
