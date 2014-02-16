@@ -34,7 +34,7 @@ $app = (new Arya\Application)
 
 ## Requirements and Installation
 
-- PHP (5.3+)
+- PHP (5.4+)
 - [Auryn](https://github.com/rdlowrey/Auryn) for: automated dependency injection
 - [Artax](https://github.com/rdlowrey/Artax) for: running automated tests
 
