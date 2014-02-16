@@ -112,7 +112,10 @@ class Request implements \ArrayAccess, \Iterator {
     }
 
     public function hasQueryParameter($field) {
-        return isset($this->query[$field]);
+        foreach (is_array($field)||is_object($field)?$field:func_get_args() as $key)
+            if (!isset($this->query[$key]))
+                return false;
+        return true;
     }
 
     public function getQueryParameter($field) {
