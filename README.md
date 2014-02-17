@@ -40,9 +40,6 @@ $app = (new Arya\Application)
 - [Auryn](https://github.com/rdlowrey/Auryn) for: automated dependency injection
 - [Artax](https://github.com/rdlowrey/Artax) for: running automated tests
 
-> **NOTE:** Artax requires PHP 5.4+, however the Artax library is only used for running test suites.
-> All library code is expected to work in PHP 5.3+ production environments.
-
 **Github**
 
 You can clone the latest Arya iteration at anytime from the github repository. By using the
