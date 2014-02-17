@@ -125,6 +125,16 @@ class Request implements \ArrayAccess, \Iterator {
         return true;
     }
 
+    /**
+     * Retrieve the value of a query parameter
+     *
+     * If the specified query parameter does not exist a \DomainException is thrown. If uncaught
+     * this exception results in a 500 Internal Server Error being relayed to the user.
+     *
+     * @param string $field
+     * @throws \DomainException If query field does not exist in the request
+     * @return mixed
+     */
     public function getQueryParameter($field) {
         if (isset($this->query[$field])) {
             return $this->query[$field];
@@ -135,26 +145,46 @@ class Request implements \ArrayAccess, \Iterator {
         }
     }
 
-    public function getArrayParameter($field) {
+    /**
+     * A convenience method for retrieving a query parameter with the expectation that the value is an array
+     *
+     * An uncaught UserInputException will result in a 400 Invalid Query Parameter response being
+     * returned to the user.
+     *
+     * @throws UserInputException
+     * @param string $field
+     * @return array
+     */
+    public function getArrayQueryParameter($field) {
         $value = $this->getQueryParameter($field);
 
         if(is_array($value)) {
             return $value;
         } else {
-            throw new Routing\InvalidQueryParameterTypeException(
-                sprintf("Wrong query parameter type: %s", gettype($value))
+            throw new UserInputException(
+                sprintf("Wrong query parameter type (%s) at parameter %s", gettype($field), $field)
             );
         }
     }
 
-    public function getStringParameter($field) {
+    /**
+     * A convenience method for retrieving a query parameter with the expectation that the value is an array
+     *
+     * An uncaught UserInputException will result in a 400 Invalid Query Parameter response being
+     * returned to the user.
+     *
+     * @throws UserInputException
+     * @param string $field
+     * @return array
+     */
+    public function getStringQueryParameter($field) {
         $value = $this->getQueryParameter($field);
 
         if(is_string($value)) {
             return $value;
         } else {
-            throw new Routing\InvalidQueryParameterTypeException(
-                sprintf("Wrong query parameter type: %s", gettype($value))
+            throw new UserInputException(
+                sprintf("Wrong query parameter type (%s) at parameter %s", gettype($field), $field)
             );
         }
     }
@@ -167,6 +197,16 @@ class Request implements \ArrayAccess, \Iterator {
         return isset($this->form[$field]);
     }
 
+    /**
+     * Retrieve the value of a submitted form field
+     *
+     * If the specified form field does not exist a \DomainException is thrown. If uncaught
+     * this exception results in a 500 Internal Server Error being relayed to the user.
+     *
+     * @param string $field
+     * @throws \DomainException If form field does not exist in the request
+     * @return mixed
+     */
     public function getFormField($field) {
         if (isset($this->form[$field])) {
             return $this->form[$field];
@@ -177,27 +217,46 @@ class Request implements \ArrayAccess, \Iterator {
         }
     }
 
-    public function getArrayField($field) {
+    /**
+     * A convenience method for retrieving a form field with the expectation that the value is an array
+     *
+     * An uncaught UserInputException will result in a 400 Invalid Query Parameter response being
+     * returned to the user.
+     *
+     * @throws UserInputException
+     * @param string $field
+     * @return array
+     */
+    public function getArrayFromField($field) {
         $value = $this->getFormField($field);
 
         if (is_array($value)) {
             return $value;
         } else {
-            throw new Routing\InvalidQueryParameterTypeException(
-                sprintf("Wrong query parameter type: %s", gettype($field))
+            throw new UserInputException(
+                sprintf("Wrong form field type (%s) at form field %s", gettype($field), $field)
             );
         }
     }
 
-
-    public function getStringField($field) {
+    /**
+     * A convenience method for retrieving a form field with the expectation that the value is a string
+     *
+     * An uncaught UserInputException will result in a 400 Invalid Query Parameter response being
+     * returned to the user.
+     *
+     * @throws UserInputException
+     * @param string $field
+     * @return string
+     */
+    public function getStringFormField($field) {
         $value = $this->getFormField($field);
 
         if (is_string($value)) {
             return $value;
         } else {
-            throw new Routing\InvalidQueryParameterTypeException(
-                sprintf("Wrong query parameter type: %s", gettype($field))
+            throw new UserInputException(
+                sprintf("Wrong form field type (%s) at form field %s", gettype($field), $field)
             );
         }
     }

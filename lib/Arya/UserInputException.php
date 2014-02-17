@@ -1,5 +1,5 @@
 <?php
 
-namespace Arya\Routing;
+namespace Arya;
 
 class UserInputException extends \UnexpectedValueException {}

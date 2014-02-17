@@ -119,6 +119,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $uri = self::$baseUri . '/test-invalid-query-parameter-type?arg1[]=value';
         $response = self::$client->request($uri);
         $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals('Bad Input Parameter', $response->getReason());
     }
 
     public function testAppWideBeforeMiddleware() {

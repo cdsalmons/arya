@@ -60,7 +60,7 @@ function testComplexResponseFunctionTarget(Request $request) {
 }
 
 function testInvalidQueryParameterType(Request $request) {
-    return $request->getStringParameter('arg1');
+    return $request->getStringQueryParameter('arg1');
 }
 
 function beforeAll($request) {

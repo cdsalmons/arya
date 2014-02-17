@@ -10,8 +10,6 @@ use Auryn\Injector,
     Arya\Routing\Router,
     Arya\Routing\NotFoundException,
     Arya\Routing\MethodNotAllowedException,
-    Arya\Routing\UserInputException,
-    Arya\Routing\InvalidQueryParameterException,
     Arya\Routing\CompositeRegexRouter,
     Arya\Sessions\Session;
 
@@ -345,7 +343,7 @@ class Application {
                 $this->applyMethodNotAllowedResponse($allowedMethods);
             }
         } catch (UserInputException $e) {
-            $this->applyBadRequestResponse();
+            $this->applyBadUserInputResponse($e->getMessage());
         } catch (InjectionException $e) {
             $this->applyExceptionResponse(new \RuntimeException(
                 $msg = 'Route handler injection failure',
@@ -372,16 +370,19 @@ class Application {
         ));
     }
 
-    private function applyBadRequestResponse() {
-        $this->response->importArray(array(
+    private function applyBadUserInputResponse($errorMessage) {
+        $reason = 'Bad Input Parameter';
+        $errorMessage = $errorMessage ?: 'Invalid form or query parameter input';
+        $this->response->importArray([
             'status' => 400,
-            'body' => '<html><body><h1>400 Bad Request</h1></body></html>'
-        ));
+            'reason' => $reason,
+            'body' => "<html><body><h1>400 {$reason}</h1><p>{$errorMessage}</p></body></html>"
+        ]);
     }
 
     private function sendResponse() {
         // @TODO Decide if headers assigned with header() should
-        // actually be retained (probably not).
+        // actually be retained.
         if ($nativeHeaders = headers_list()) {
             foreach ($nativeHeaders as $line) {
                 $this->response->addHeaderLine($line);
