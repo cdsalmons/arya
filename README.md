@@ -20,7 +20,7 @@ $app = (new Arya\Application)
     ->route('GET', '/lambda', $anyClosure)
     ->route('GET', '/static', 'AnyClass::staticMethod')
     ->route('GET', '/instance', 'AnyClass::instanceMethod') // <-- auto dependency injection
-    ->route('GET', '/args/$#arg1/$#arg2', 'numericArgsFunction')
+    ->route('GET', '/args/{arg1:\d+}/{arg2:\d+}', 'numericArgsFunction')
     ->after(function($request, $response) { ... }) // <-- middleware before response sent
     ->run()
 ;
@@ -37,13 +37,14 @@ $app = (new Arya\Application)
 ## Requirements and Installation
 
 - PHP (5.4+)
-- [Auryn](https://github.com/rdlowrey/Auryn) for: automated dependency injection
-- [Artax](https://github.com/rdlowrey/Artax) for: running automated tests
+- [FastRoute](https://github.com/nikic/FastRoute) | high-performance routing
+- [Auryn](https://github.com/rdlowrey/Auryn) | automated dependency injection
+- [Artax](https://github.com/rdlowrey/Artax) | running automated tests
 
 **Github**
 
 You can clone the latest Arya iteration at anytime from the github repository. By using the
-`--recursive` option git will automatically retrieve the Auryn and Artax submodules for us.
+`--recursive` option git will automatically retrieve dependency submodules for us.
 
 ```bash
 $ git clone --recursive git://github.com/rdlowrey/Arya.git
@@ -172,18 +173,15 @@ $app = (new Arya\Application)->route('GET', '/', 'MyClass::get')->run();
 
 ### Route Arguments
 
-Arya uses a very simple routing syntax to maximize performance. More advanced data validations have
-no business in the routing layer and can easily be performed inside your route targets (where they
-belong). Any route segment beginning with a `$` character is treated as a URI variable and passed
-to the matched target callable:
+Arya uses [FastRoute](https://github.com/nikic/FastRoute) for routing.
 
 ```
-/lol-cats/$catType/$#catId  // $catType: [^/]+ and $catId: [\d]+
-/widgets/$#widgetId         // $widgetId: [^/]+
-/kumqats/$#kumqatId         // $kumqatId: [^/]+
+/lol-cats/{catType}/{catId:\d+}
+/widgets/{widgetId:\d+}
+/kumqats/{kumqatId}
 ```
 
-When URI arguments are matched they are available to route targets in two different ways:
+When named URI arguments are matched they are available to route targets in two different ways:
 
 1. As associative array keys in the `$request['ROUTE_ARGS']` array
 2. As paramaters with matching names in the route target's method/function signature
@@ -218,13 +216,6 @@ Every client request follows one of three paths through the routing system:
 1. No request URI match is found: `404 Not Found`
 2. A request URI is matched, but the HTTP verb does not match: `405 Method Not Allowed`
 3. The request URI and HTTP method match a route and the associated target is invoked
-
-> **NOTE:** HTTP method verbs are *case-sensitive* as defined in RFC 2616. Arya automatically
-> normalizes method names specified at Argument 1 of `Application::route` to uppercase to avoid
-> errors. This behavior may be optionally disabled should you wish to handle custom HTTP methods
-> containing lower-case characters.
-
-
 
 ## Middleware
 
