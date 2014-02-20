@@ -52,13 +52,11 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
         if (0 === strpos($class, 'Arya\\')) {
             $class = str_replace('\\', '/', $class);
             $file = __DIR__ . "/lib/{$class}.php";
-            if (file_exists($file)) {
-                require $file;
-            }
+            require $file;
         }
     });
-    
-    require __DIR__ . '/vendor/Auryn/autoload.php';
+
+    require __DIR__ . '/vendor/FastRoute/bootstrap.php';
 }
 
 if (isset($__application)) {
