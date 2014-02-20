@@ -16,11 +16,10 @@
     "rdlowrey/auryn": "~0.12.0"
   },
   "require-dev": {
-    "rdlowrey/artax": "~0.6.2"
+    "rdlowrey/artax": "~0.6.2",
+    "nikic/fast-route"
   },
   "autoload": {
-    "psr-0": {
-      "Arya": "lib/"
-    }
+    "files": ["src/bootstrap.php"]
   }
 }
