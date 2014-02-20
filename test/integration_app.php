@@ -71,14 +71,6 @@ function afterAll($request, $response) {
     $response->addHeader('X-Before-Test', $request['BEFORE_ALL_TEST']);
 }
 
-function beforeSpecific($request) {
-    $request['BEFORE_ALL_SPECIFIC_TEST'] = 'test';
-}
-
-function afterSpecific($request, $response) {
-    $response->addHeader('X-Before-Specific-Test', $request['BEFORE_ALL_SPECIFIC_TEST']);
-}
-
 function afterWithUriFilter($response) {
     $response->setHeader('X-Zanzibar', 'zanzibar!');
 }
@@ -100,17 +92,13 @@ $app = (new Application)
     ->route('GET', '/test-lambda-target', $lambda)
     ->route('GET', '/test-static-target', 'TestStaticClass::get')
     ->route('GET', '/test-instance-method-target', 'TestInstanceMethod::get')
-    ->route('GET', '/$arg1/$arg2/$#arg3', 'testRouteArgsFunctionTarget')
+    ->route('GET', '/{arg1}/{arg2}/{arg3:\d+}', 'testRouteArgsFunctionTarget')
     ->route('GET', '/generates-output', 'testGeneratesOutputFunctionTarget')
     ->route('GET', '/complex-response', 'testComplexResponseFunctionTarget')
     ->route('GET', '/zanzibar/test', 'testFunctionTarget')
     ->route('GET', '/fatal', 'fatalFunction')
     ->route('GET', '/exception', 'exceptionFunction')
-    ->route('GET', '/test/\$arg1/$arg1', 'testFunctionTarget')
     ->route('GET', '/test-invalid-query-parameter-type', 'testInvalidQueryParameterType')
-    ->route('GET', '/test-route-specific-middleware', 'testFunctionTarget')
-        ->beforeRoute('beforeSpecific')
-        ->afterRoute('afterSpecific')
     ->before('beforeAll')
     ->after('afterAll')
     ->after('afterWithUriFilter', $options = array('uri' => '/zanzibar/*'))

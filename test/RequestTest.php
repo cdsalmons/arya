@@ -75,7 +75,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($request->hasHeader('Content-Type'));
         $this->assertSame('multipart/form-data', $request->getHeader('Content-Type'));
     }
-    
+
     /**
      * @expectedException \DomainException
      */
@@ -222,8 +222,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request->set($field, 'another change');
         $this->assertSame('another change', $request[$field]);
     }
-
-
 
     public function testBody() {
         list($_server, $_get, $_post, $_files, $_cookie, $_input) = $this->getRequiredServerVars();

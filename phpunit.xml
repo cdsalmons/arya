@@ -21,7 +21,6 @@
         <const name="WEB_SERVER_HOST" value="127.0.0.1" />
         <const name="WEB_SERVER_PORT" value="9500" />
         <const name="WEB_SERVER_ROUTER" value="./test/integration_front_controller.php" />
-        <!--<const name="WEB_SERVER_DOCROOT" value="./public" />-->
     </php>
 
     <filter>

@@ -96,13 +96,6 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(42, current($response->getHeader('X-Before-Test')));
     }
 
-    public function testRouteSpecificBeforeAndAfterMiddleware() {
-        $uri = self::$baseUri . '/test-route-specific-middleware';
-        $response = self::$client->request($uri);
-        $this->assertTrue($response->hasHeader('X-Before-Specific-Test'));
-        $this->assertEquals('test', current($response->getHeader('X-Before-Specific-Test')));
-    }
-
     public function testAfterMiddlewareWithUriFilter() {
         // Matches /zanzibar/* URI filter
         $uri = self::$baseUri . '/zanzibar/test';
@@ -134,11 +127,5 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $request->setUri($uri)->setMethod('POST');
         $response = self::$client->request($request);
         $this->assertEquals(405, $response->getStatus());
-    }
-
-    public function testFirstDollarEscapedInVariableUri() {
-        $uri = self::$baseUri . '/test/' . urlencode('$arg1') . '/test';
-        $response = self::$client->request($uri);
-        $this->assertEquals(200, $response->getStatus());
     }
 }
