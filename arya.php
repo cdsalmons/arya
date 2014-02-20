@@ -49,10 +49,9 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 } else {
     spl_autoload_register(function($class) {
-        if (0 === strpos($class, 'Arya\\')) {
-            $class = str_replace('\\', '/', $class);
-            $file = __DIR__ . "/lib/{$class}.php";
-            require $file;
+        if (strpos($class, 'Arya\\') === 0) {
+            $name = substr($class, strlen('Arya'));
+            require __DIR__ . strtr($name, '\\', DIRECTORY_SEPARATOR) . '.php';
         }
     });
 
