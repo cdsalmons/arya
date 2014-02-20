@@ -7,10 +7,6 @@ use Auryn\Injector,
     Auryn\InjectionException,
     Arya\Status,
     Arya\Reason,
-    Arya\Routing\Router,
-    Arya\Routing\NotFoundException,
-    Arya\Routing\MethodNotAllowedException,
-    Arya\Routing\CompositeRegexRouter,
     Arya\Sessions\Session;
 
 class Application {
@@ -34,6 +30,7 @@ class Application {
         'app.allow_empty_response' => FALSE,
         'app.auto_urldecode' => TRUE,
         'routing.cache_file' => NULL,
+        'session.class' => 'Arya\Sessions\FileSessionHandler',
         'session.strict' => TRUE,
         'session.class' => 'Arya\\Sessions\\FileSessionHandler',
         'session.cookie_name' => 'ARYASESSID',
