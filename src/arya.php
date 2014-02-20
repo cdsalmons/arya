@@ -1,18 +1,22 @@
 <?php
 
-// --- DO NOT MODIFY THIS FILE! --- //
+/* --- DO NOT MODIFY THIS FILE! --- */
 
 error_reporting(E_ALL | E_STRICT);
 
-$__debug = isset($__debug) ? (bool) $__debug : FALSE;
+date_default_timezone_set(ini_get('date.timezone') ?: 'UTC');
+
+if (!defined('DEBUG')) {
+    define('DEBUG', TRUE);
+}
 
 /**
  * Parse errors cannot be handled inside the same file where they originate.
  * For this reason we have to include the application file externally here
  * so that our shutdown function can handle E_PARSE.
  */
-register_shutdown_function(function() use ($__debug) {
-    $fatals = array(
+register_shutdown_function(function() {
+    $fatals = [
         E_ERROR,
         E_PARSE,
         E_USER_ERROR,
@@ -20,7 +24,7 @@ register_shutdown_function(function() use ($__debug) {
         E_CORE_WARNING,
         E_COMPILE_ERROR,
         E_COMPILE_WARNING
-    );
+    ];
 
     $lastError = error_get_last();
 
@@ -32,7 +36,7 @@ register_shutdown_function(function() use ($__debug) {
         header_remove();
         header("HTTP/1.0 500 Internal Server Error");
 
-        if ($__debug) {
+        if (DEBUG) {
             extract($lastError);
             $msg = sprintf("Fatal error: %s in %s on line %d", $message, $file, $line);
         } else {
@@ -45,23 +49,11 @@ register_shutdown_function(function() use ($__debug) {
     }
 });
 
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require_once __DIR__ . '/vendor/autoload.php';
-} else {
-    spl_autoload_register(function($class) {
-        if (strpos($class, 'Arya\\') === 0) {
-            $name = substr($class, strlen('Arya'));
-            require __DIR__ . strtr($name, '\\', DIRECTORY_SEPARATOR) . '.php';
-        }
-    });
-
-    require __DIR__ . '/vendor/FastRoute/bootstrap.php';
-}
-
-if (isset($__application)) {
-    require $__application;
+if (defined('APPLICATION')) {
+    require __DIR__ . '/bootstrap.php';
+    require APPLICATION;
 } else {
     throw new RuntimeException(
-        'No $__application file specified'
+        'No APPLICATION constant specified'
     );
 }
