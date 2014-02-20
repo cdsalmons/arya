@@ -20,19 +20,22 @@ class Application {
     private $request;
     private $response;
     private $session;
+    private $routes = [];
 
     private $befores = array();
     private $afters = array();
     private $finalizers = array();
+    
+    private $canSerializeRoutes = TRUE;
 
     private $options = array(
-        'app.debug' => TRUE,
+        'app.debug' => NULL,
         'app.auto_reason' => TRUE,
-        'app.normalize_method_case' => TRUE,
         'app.allow_empty_response' => FALSE,
         'app.auto_urldecode' => TRUE,
-        'session.class' => 'Arya\Sessions\FileSessionHandler',
+        'routing.cache_file' => NULL,
         'session.strict' => TRUE,
+        'session.class' => 'Arya\\Sessions\\FileSessionHandler',
         'session.cookie_name' => 'ARYASESSID',
         'session.cookie_domain' => '',
         'session.cookie_path' => '',
@@ -51,29 +54,37 @@ class Application {
         'session.save_path' => NULL
     );
 
-    public function __construct(Injector $injector = NULL, Router $router = NULL) {
+    public function __construct(Injector $injector = NULL, $debug = NULL) {
         $this->injector = $injector ?: new Provider;
-        $this->router = $router ?: new CompositeRegexRouter;
 
-        $self = $this;
+        if (isset($debug)) {
+            $debug = (bool) $debug;
+        } elseif (defined('DEBUG')) {
+            $debug = (bool) $debug;
+        } else {
+            $debug = TRUE;
+        }
+
+        $this->options['app.debug'] = $debug;
+        $this->options['routing.cache_file'] = __DIR__ . '/../var/routes.cache';
     }
 
     /**
      * Add a route handler
      *
      * @param string $httpMethod
-     * @param string $route
+     * @param string $uri
      * @param mixed $handler
-     * @return AppRouteProxy
+     * @return Application Returns the current object instance
      */
     public function route($httpMethod, $uri, $handler) {
-        if ($this->options['app.normalize_method_case']) {
-            $httpMethod = strtoupper($httpMethod);
+        $this->routes[] = [$httpMethod, $uri, $handler];
+
+        if ($handler instanceof \Closure) {
+            $this->canSerializeRoutes = FALSE;
         }
 
-        $this->router->addRoute($httpMethod, $uri, $handler);
-
-        return new AppRouteProxy($this, $httpMethod, $uri);
+        return $this;
     }
 
     /**
@@ -124,7 +135,7 @@ class Application {
     }
 
     /**
-     * Respond to client requests
+     * Respond to the client request
      *
      * The run method allows users to inject their own Arya\Request instance (which can be useful
      * for testing). Most use-cases should leave the parameter unassigned as Arya will auto-generate
@@ -181,6 +192,22 @@ class Application {
         }
 
         $this->sendResponse();
+    }
+
+    private function loadRouter() {
+        $callable = function(\FastRoute\RouteCollector $r) {
+            foreach ($this->routes as $routeStruct) {
+                list($httpMethod, $uri, $handler) = $routeStruct;
+                $r->addRoute($httpMethod, $uri, $handler);
+            }
+        };
+        
+        return $this->canSerializeRoutes
+            ? \FastRoute\cachedDispatcher($callable, [
+                'cacheFile' => $this->options['routing.cache_file'],
+                'cacheDisabled' => $this->options['app.debug']
+            ])
+            : \FastRoute\simpleDispatcher($callable);
     }
 
     private function generateRequest() {
@@ -305,42 +332,31 @@ class Application {
         ));
     }
 
-    private function routeRequest($forceMethod = NULL) {
+    private function routeRequest() {
         try {
-            $request = $this->request;
-            $method = $forceMethod ?: $request['REQUEST_METHOD'];
-            $uriPath = $request['REQUEST_URI_PATH'];
-            list($routeHandler, $routeArgs) = $this->router->route($method, $uriPath);
+            $method = $this->request['REQUEST_METHOD'];
+            $uriPath = $this->request['REQUEST_URI_PATH'];
 
-            $request['ROUTE_ARGS'] = $routeArgs;
-            $paramLiterals = array(
-                ':request' => $request,
-                ':response' => $this->response
-            );
+            $router = $this->loadRouter();
+            $routingResult = $router->dispatch($method, $uriPath);
 
-            if ($routeArgs) {
-                foreach ($routeArgs as $key => $value) {
-                    $paramLiterals[":{$key}"] = $value;
-                }
-            }
-
-            $result = $this->injector->execute($routeHandler, $paramLiterals);
-
-            if ($result instanceof Response) {
-                $this->response->import($result);
-            } elseif (is_array($result)) {
-                $this->response->importArray($result);
-            } else {
-                $this->response->setBody($result);
-            }
-        } catch (NotFoundException $e) {
-            $this->applyNotFoundResponse();
-        } catch (MethodNotAllowedException $e) {
-            if ($method === 'HEAD') {
-                $this->routeRequest($forceMethod = 'GET');
-            } else {
-                $allowedMethods = $e->getAllowedMethods();
-                $this->applyMethodNotAllowedResponse($allowedMethods);
+            switch ($routingResult[0]) {
+                case \FastRoute\Dispatcher::FOUND:
+                    $handler = $routingResult[1];
+                    $routeArgs = $routingResult[2];
+                    $this->dispatchFoundRoute($handler, $routeArgs);
+                    break;
+                case \FastRoute\Dispatcher::NOT_FOUND:
+                    $this->applyNotFoundResponse();
+                    break;
+                case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                    $allowedMethods = $routingResult[1];
+                    $this->applyMethodNotAllowedResponse($allowedMethods);
+                    break;
+                default:
+                    throw new \UnexpectedValueException(
+                        sprintf('Unknown route dispatcher status code: %s', $routingResult[0])
+                    );
             }
         } catch (UserInputException $e) {
             $this->applyBadUserInputResponse($e->getMessage());
@@ -352,6 +368,31 @@ class Application {
             ));
         } catch (\Exception $e) {
             $this->applyExceptionResponse($e);
+        }
+    }
+
+    private function dispatchFoundRoute($handler, array $routeArgs) {
+        $this->request['ROUTE_ARGS'] = $routeArgs;
+
+        $injectionLiterals = [
+            ':request' => $this->request,
+            ':response' => $this->response
+        ];
+
+        if ($routeArgs) {
+            foreach ($routeArgs as $key => $value) {
+                $injectionLiterals[":{$key}"] = $value;
+            }
+        }
+
+        $result = $this->injector->execute($handler, $injectionLiterals);
+
+        if ($result instanceof Response) {
+            $this->response->import($result);
+        } elseif (is_array($result)) {
+            $this->response->importArray($result);
+        } elseif ($result) {
+            $this->response->setBody($result);
         }
     }
 
@@ -381,8 +422,6 @@ class Application {
     }
 
     private function sendResponse() {
-        // @TODO Decide if headers assigned with header() should
-        // actually be retained.
         if ($nativeHeaders = headers_list()) {
             foreach ($nativeHeaders as $line) {
                 $this->response->addHeaderLine($line);

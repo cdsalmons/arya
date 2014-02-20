@@ -4,3 +4,6 @@
 [submodule "vendor/Artax"]
 	path = vendor/Artax
 	url = https://github.com/rdlowrey/Artax.git
+[submodule "vendor/FastRoute"]
+	path = vendor/FastRoute
+	url = https://github.com/nikic/FastRoute.git
