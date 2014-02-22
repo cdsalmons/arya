@@ -60,7 +60,7 @@ $ git clone --recursive git://github.com/rdlowrey/Arya.git
 #### Composer
 
 ```bash
-$ php composer.phar require rdlowrey/arya
+$ php composer.phar create-project rdlowrey/arya /path/to/later/location/Arya dev-master
 ```
 
 #### Manual Download
