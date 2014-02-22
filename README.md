@@ -10,7 +10,7 @@ maximize flexibility while maintaining simplicity and performance.
 
 ![Travis build https://api.travis-ci.org/rdlowrey/Arya.png?branch=master](https://api.travis-ci.org/rdlowrey/Arya.png?branch=master)
 
-**Basic Example**
+#### Basic Example
 
 ```php
 <?php
@@ -26,8 +26,7 @@ $app = (new Arya\Application)
 ;
 ```
 
-
-**Project Goals**
+#### Project Goals
 
 - Model code on the HTTP/1.1 protocol as outlined in RFC 2616;
 - Build components using SOLID, readable and well-tested code;
@@ -36,12 +35,20 @@ $app = (new Arya\Application)
 
 ## Requirements and Installation
 
-- PHP (5.4+)
+#### Basic Requirements
+
+- [PHP](http://php.net) (5.4+)
 - [FastRoute](https://github.com/nikic/FastRoute) | high-performance routing
 - [Auryn](https://github.com/rdlowrey/Auryn) | automated dependency injection
+
+#### Testing Requirements
+
+- [PHPUnit](http://phpunit.de/) | running automated tests
 - [Artax](https://github.com/rdlowrey/Artax) | running automated tests
 
-**Github**
+### Download
+
+#### Github
 
 You can clone the latest Arya iteration at anytime from the github repository. By using the
 `--recursive` option git will automatically retrieve dependency submodules for us.
@@ -50,16 +57,54 @@ You can clone the latest Arya iteration at anytime from the github repository. B
 $ git clone --recursive git://github.com/rdlowrey/Arya.git
 ```
 
-**Composer**
+#### Composer
 
 ```bash
 $ php composer.phar require rdlowrey/arya
 ```
 
-**Manual Download**
+#### Manual Download
 
 Archived tagged release versions are also available (or will be) for manual download on the project
 [tags page](https://github.com/rdlowrey/Arya/tags).
+
+### Server Setup
+
+Arya acts as a front-controller to route all requests. To make this work you must configure your
+front-facing server to direct all requests to a single file.
+
+#### Apache
+
+With Apache 2.2.16 or higher, you can use the FallbackResource directive in your configuration
+file (.htaccess/httpd.conf/vhost.conf):
+
+```
+FallbackResource /front_controller.php
+```
+
+If you have an older version of Apache you should instead add this block to your config file:
+
+```
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+
+    RewriteEngine On
+    RewriteBase /path/to/app
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ front_controller.php [QSA,L]
+</IfModule>
+```
+
+#### Nginx
+@TODO
+
+#### PHP Server
+
+As of PHP 5.4 you can use the built-in development server to quickly run your application:
+
+```bash
+$ php -S localhost:8080 front_controller.php
+```
 
 ## Contributions
 
@@ -403,43 +448,3 @@ In these cases route targets may return an instance of the `Arya\Response` class
 
 ### Debug Mode
 @TODO
-
-
-## Server Setup
-
-Arya acts as a front-controller to route all requests. To make this work you must configure your
-front-facing server to direct all requests to a single file.
-
-### Apache
-
-With Apache 2.2.16 or higher, you can use the FallbackResource directive in your configuration
-file (.htaccess/httpd.conf/vhost.conf):
-
-```
-FallbackResource /front_controller.php
-```
-
-If you have an older version of Apache you should instead add this block to your config file:
-
-```
-<IfModule mod_rewrite.c>
-    Options -MultiViews
-
-    RewriteEngine On
-    RewriteBase /path/to/app
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ front_controller.php [QSA,L]
-</IfModule>
-```
-
-## Nginx
-@TODO
-
-## PHP Server
-
-As of PHP 5.4 you can use the built-in development server to quickly run your application:
-
-
-```bash
-$ php -S localhost:8080 front_controller.php
-```
