@@ -17,6 +17,7 @@
     "nikic/fast-route": "dev-master"
   },
   "require-dev": {
+    "phpunit/phpunit": "3.7",
     "rdlowrey/artax": "~0.6.2"
   },
   "autoload": {
