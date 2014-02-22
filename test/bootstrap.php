@@ -12,9 +12,15 @@ spl_autoload_register(function($class) {
     }
 });
 
-require __DIR__ . '/../vendor/Auryn/autoload.php';
-require __DIR__ . '/../vendor/Artax/autoload.php';
-require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';
+$composerAutoloader = __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists($composerAutoloader)) {
+    require $composerAutoloader;
+} else {
+    require __DIR__ . '/../vendor/Auryn/autoload.php';
+    require __DIR__ . '/../vendor/Artax/autoload.php';
+    require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';
+}
 
 $serverCommand = sprintf(
     '%s -S %s:%d %s >/dev/null 2>&1 & echo $!',
