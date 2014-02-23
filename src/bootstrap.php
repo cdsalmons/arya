@@ -8,4 +8,3 @@ spl_autoload_register(function($class) {
 });
 
 require __DIR__ . '/../vendor/Auryn/autoload.php';
-require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';
