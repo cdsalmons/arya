@@ -251,7 +251,7 @@ $asgiRequest = [
     'REMOTE_PORT'        => '9382',
     'REQUEST_METHOD'     => 'GET',
     'REQUEST_URI'        => '/hello_world.php?foo=bar',
-    'REQUEST_URI_PATH'   => '/hello_world.php?foo=bar',
+    'REQUEST_URI_PATH'   => '/hello_world.php',
     'HTTPS'              => FALSE,
     'QUERY_STRING'       => '?foo=bar',
     'CONTENT_TYPE'       => 'text/plain',
@@ -266,7 +266,7 @@ $asgiRequest = [
     'HTTP_ACCEPT_ENCODING'  => 'gzip,deflate,sdch',
     'HTTP_ACCEPT_LANGUAGE'  => 'en-US,en;q=0.8',
     'HTTP_ACCEPT_CHARSET'   => 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-    'HTTP_COOKIE'           => 'var1=value1&var2=value2';
+    'HTTP_COOKIE'           => 'var1=value1&var2=value2',
 
     // --- ASGI_* KEYS --- //
 
@@ -276,4 +276,3 @@ $asgiRequest = [
     'ASGI_NON_BLOCKING'     => TRUE
 ];
 ```
-
