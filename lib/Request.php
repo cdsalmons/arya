@@ -152,6 +152,7 @@ class Request implements \ArrayAccess, \Iterator {
      * returned to the user.
      *
      * @throws UserInputException
+     * @throws \DomainException If query field does not exist in the request
      * @param string $field
      * @return array
      */
@@ -168,12 +169,13 @@ class Request implements \ArrayAccess, \Iterator {
     }
 
     /**
-     * A convenience method for retrieving a query parameter with the expectation that the value is an array
+     * A convenience method for retrieving a query parameter with the expectation that the value is a string
      *
      * An uncaught UserInputException will result in a 400 Invalid Query Parameter response being
      * returned to the user.
      *
      * @throws UserInputException
+     * @throws \DomainException If query field does not exist in the request
      * @param string $field
      * @return array
      */
@@ -224,6 +226,7 @@ class Request implements \ArrayAccess, \Iterator {
      * returned to the user.
      *
      * @throws UserInputException
+     * @throws \DomainException If form field does not exist in the request
      * @param string $field
      * @return array
      */
@@ -246,6 +249,7 @@ class Request implements \ArrayAccess, \Iterator {
      * returned to the user.
      *
      * @throws UserInputException
+     * @throws \DomainException If form field does not exist in the request
      * @param string $field
      * @return string
      */
