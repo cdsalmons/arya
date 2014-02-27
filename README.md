@@ -206,13 +206,13 @@ class MyController {
     }
 }
 
-$app = (new Arya\Application)->route('GET', '/', 'MyClass::get')->run();
+$app = (new Arya\Application)->route('GET', '/', 'MyController::get')->run();
 ```
 
 > **IMPORTANT:** Arya also recursively injects any dependencies you typehint in your controller
 > method signatures. In the above example we use constructor injection to provide the `Templater`
 > object that renders our HTML response. However, we could have alternatively typehinted the
-> `Templater` in our `MyClass::get` method signature and injected it at call time.
+> `Templater` in our `MyController::get` method signature and injected it at call time.
 
 ### Route Arguments
 
