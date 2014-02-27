@@ -48,7 +48,7 @@ $app = (new Arya\Application)
 
 #### Github
 
-You can clone the latest Arya iteration at anytime from the github repository. By using the
+You can clone the latest Arya iteration at anytime from the Github repository. By using the
 `--recursive` option git will automatically retrieve dependency submodules for us.
 
 ```bash
@@ -227,7 +227,7 @@ Arya uses [FastRoute](https://github.com/nikic/FastRoute) for routing.
 When named URI arguments are matched they are available to route targets in two different ways:
 
 1. As associative array keys in the `$request['ROUTE_ARGS']` array
-2. As paramaters with matching names in the route target's method/function signature
+2. As parameters with matching names in the route target's method/function signature
 
 So, let's consider a match for our `/lol-cats` route from above:
 
@@ -248,7 +248,7 @@ $app = (new Application)
     ->run();
 ```
 
-The takeway here is that you can accept your URI route arguments as parameters with matching names
+The takeaway here is that you can accept your URI route arguments as parameters with matching names
 in your route target signature if you like but they'll always be available in the
 `$request['ROUTE_ARGS']` array as well.
 
