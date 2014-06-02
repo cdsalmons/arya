@@ -73,7 +73,7 @@ class Request implements \ArrayAccess, \Iterator {
         if ($_input
             && $this->vars['REQUEST_METHOD'] !== 'POST'
             && isset($this->vars['CONTENT_TYPE'])
-            && stripos($this->vars['CONTENT_TYPE'], 'multpart/form-data') === 0
+            && stripos($this->vars['CONTENT_TYPE'], 'multipart/form-data') === 0
         ) {
             $this->parseMultipartFormData($_input);
         }
