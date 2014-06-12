@@ -128,7 +128,7 @@ please read the [CONTRIBUTORS][contributors] file.
 
 **Dependency Injection**
 
-@TODO
+* [Auryn dependency injector](#dependency-injection)
 
 **HTTP Protocol**
 
@@ -329,17 +329,18 @@ constructor or callable signature (wherever the middleware asks for them).
 
 
 ### Finalize
+
 @TODO "Final" middleware not yet operational
 
 
-
-
-
-
 ## Dependency Injection
-@TODO
 
+Arya internally uses the [Auyrn](https://github.com/rdlowrey/Auryn) dependency injector.
 
+To share our definitions, aliases etc. with Arya, we can pass our Auryn\Injector instance
+as the first argument to the Application constructor.
+
+If no Auryn\Injector instance is passed, the Application class will instance its own injector.
 
 ## HTTP Protocol
 
@@ -433,9 +434,8 @@ In these cases route targets may return an instance of the `Arya\Response` class
 @TODO Talk about entity body
 
 ### Callable Response Bodies
+
 @TODO
-
-
 
 
 ## Other
