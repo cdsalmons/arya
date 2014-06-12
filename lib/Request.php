@@ -133,7 +133,7 @@ class Request implements \ArrayAccess, \Iterator {
      *
      * @param string $field
      * @throws \DomainException If query field does not exist in the request
-     * @return mixed
+     * @return array|string
      */
     public function getQueryParameter($field) {
         if (isset($this->query[$field])) {
@@ -177,7 +177,7 @@ class Request implements \ArrayAccess, \Iterator {
      * @throws UserInputException
      * @throws \DomainException If query field does not exist in the request
      * @param string $field
-     * @return array
+     * @return string
      */
     public function getStringQueryParameter($field) {
         $value = $this->getQueryParameter($field);
