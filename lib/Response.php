@@ -104,7 +104,9 @@ class Response implements \ArrayAccess {
         $ucField = strtoupper($field);
 
         if ($ucField === 'SET-COOKIE') {
-            return $this->setCookieFromRawHeaderValue($value);
+            $this->setCookieFromRawHeaderValue($value);
+
+            return NULL;
         } elseif (is_scalar($value)) {
             $value = array($value);
         } elseif (!(is_array($value) && $this->isValidArrayHeader($value))) {
@@ -120,7 +122,7 @@ class Response implements \ArrayAccess {
     }
 
     private function isValidArrayHeader(array $headerValues) {
-        foreach ($headerValues as $key => $value) {
+        foreach ($headerValues as $value) {
             if (!is_scalar($value)) {
                 return FALSE;
             }
@@ -448,7 +450,8 @@ class Response implements \ArrayAccess {
      * multiple values are assigned for the field an array of scalars is returned.
      *
      * @param string $field
-     * @return mixed[string|array]
+     * @throws \DomainException
+     * @return string|array
      */
     public function getHeader($field) {
         $ucField = strtoupper($field);
@@ -470,7 +473,7 @@ class Response implements \ArrayAccess {
     /**
      * Assign a response entity body
      *
-     * @param mixed[string|callable|Body] $body
+     * @param string|callable|Body $body
      * @throws \InvalidArgumentException
      * @return Response Returns the current object instance
      */
@@ -524,7 +527,7 @@ class Response implements \ArrayAccess {
     /**
      * Retrieve the entity body assigned for this response
      *
-     * @return mixed[void|string|callable]
+     * @return void|string|callable
      */
     public function getBody() {
         return $this->body;

@@ -11,20 +11,13 @@ class Request implements \ArrayAccess, \Iterator {
     private $cookies = array();
     private $vars = array();
     private $bodyStream;
-    private $body;
+    private $body = "";
 
     private $isEncrypted;
     private $inMemoryBodyStreamSize = 2097152;
     private $isInputStreamCopied = FALSE;
 
-    public function __construct(
-        array $_server,
-        array $_get,
-        array $_post,
-        array $_files,
-        array $_cookie,
-        $_input
-    ) {
+    public function __construct(array $_server, array $_get, array $_post, array $_files, array $_cookie, $_input) {
         $this->processServer($_server);
 
         $this->query = $_get;
@@ -32,9 +25,7 @@ class Request implements \ArrayAccess, \Iterator {
         $this->files = $_files;
         $this->cookies = $_cookie;
 
-        if ($_input) {
-            $this->processInput($_input);
-        }
+        $this->processInput($_input);
     }
 
     private function processServer(array $_server) {
@@ -63,8 +54,6 @@ class Request implements \ArrayAccess, \Iterator {
         if (isset($_server['CONTENT_TYPE'])) {
             $this->headers['CONTENT-TYPE'] = $_server['CONTENT_TYPE'];
         }
-
-        $this->originalVars = $this->vars;
     }
 
     private function processInput($_input) {
@@ -207,7 +196,7 @@ class Request implements \ArrayAccess, \Iterator {
      *
      * @param string $field
      * @throws \DomainException If form field does not exist in the request
-     * @return mixed
+     * @return string|array
      */
     public function getFormField($field) {
         if (isset($this->form[$field])) {
@@ -306,7 +295,7 @@ class Request implements \ArrayAccess, \Iterator {
     }
 
     public function hasBody() {
-        return isset($this->bodyStream) || isset($this->body);
+        return isset($this->bodyStream) || $this->body != "";
     }
 
     public function getBody() {

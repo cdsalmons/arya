@@ -5,17 +5,15 @@ namespace Arya;
 use Auryn\Injector,
     Auryn\Provider,
     Auryn\InjectionException,
-    Arya\Status,
-    Arya\Reason,
     Arya\Sessions\Session;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
 
 class Application {
 
     private $injector;
-    private $router;
     private $request;
     private $response;
-    private $session;
     private $routes = [];
 
     private $befores = array();
@@ -30,7 +28,6 @@ class Application {
         'app.allow_empty_response' => FALSE,
         'app.auto_urldecode' => TRUE,
         'routing.cache_file' => NULL,
-        'session.class' => 'Arya\Sessions\FileSessionHandler',
         'session.strict' => TRUE,
         'session.class' => 'Arya\\Sessions\\FileSessionHandler',
         'session.cookie_name' => 'ARYASESSID',
@@ -138,7 +135,7 @@ class Application {
      * for testing). Most use-cases should leave the parameter unassigned as Arya will auto-generate
      * the request automatically if not specified.
      *
-     * @param array $request The request environment
+     * @param Request $request The request environment
      * @return void
      */
     public function run(Request $request = NULL) {
@@ -192,7 +189,7 @@ class Application {
     }
 
     private function loadRouter() {
-        $callable = function(\FastRoute\RouteCollector $r) {
+        $callable = function(RouteCollector $r) {
             foreach ($this->routes as $routeStruct) {
                 list($httpMethod, $uri, $handler) = $routeStruct;
                 $r->addRoute($httpMethod, $uri, $handler);
@@ -338,15 +335,15 @@ class Application {
             $routingResult = $router->dispatch($method, $uriPath);
 
             switch ($routingResult[0]) {
-                case \FastRoute\Dispatcher::FOUND:
+                case Dispatcher::FOUND:
                     $handler = $routingResult[1];
                     $routeArgs = $routingResult[2];
                     $this->dispatchFoundRoute($handler, $routeArgs);
                     break;
-                case \FastRoute\Dispatcher::NOT_FOUND:
+                case Dispatcher::NOT_FOUND:
                     $this->applyNotFoundResponse();
                     break;
-                case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                case Dispatcher::METHOD_NOT_ALLOWED:
                     $allowedMethods = $routingResult[1];
                     $this->applyMethodNotAllowedResponse($allowedMethods);
                     break;
@@ -428,7 +425,7 @@ class Application {
         $statusCode = $this->response->getStatus();
         $reason = $this->response->getReasonPhrase();
         if ($this->options['app.auto_reason'] && empty($reason)) {
-            $reasonConstant = "Arya\Reason::HTTP_{$statusCode}";
+            $reasonConstant = "Arya\\Reason::HTTP_{$statusCode}";
             $reason = defined($reasonConstant) ? constant($reasonConstant) : '';
             $this->response->setReasonPhrase($reason);
         }

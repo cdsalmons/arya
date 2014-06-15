@@ -11,7 +11,7 @@ class JsonBody implements Body {
             $errorCode = json_last_error();
             $errorMsg = function_exists('json_last_error_msg')
                 ? json_last_error_msg($errorCode)
-                : $this->jsonErrorMsg($errorCode)
+                : $this->jsonErrorMsg($errorCode);
             throw new \RuntimeException($errorMsg);
         }
     }

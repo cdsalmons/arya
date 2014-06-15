@@ -99,6 +99,7 @@ class Session implements \ArrayAccess, \Iterator {
                 break;
             case 'strict':
                 $this->options['strict'] = (bool) $value;
+                break;
             default:
                 throw new \DomainException(
                     sprintf('Unkown session option: %s', $option)
@@ -188,10 +189,10 @@ class Session implements \ArrayAccess, \Iterator {
 
     private function setCacheLimiter($value) {
         switch ($value) {
-            case CACHE_NOCACHE: break;
-            case CACHE_PRIVATE: break;
-            case CACHE_PRIV_NO_EXP: break;
-            case CACHE_PUBLIC: break;
+            case self::CACHE_NOCACHE: break;
+            case self::CACHE_PRIVATE: break;
+            case self::CACHE_PRIV_NO_EXP: break;
+            case self::CACHE_PUBLIC: break;
             default:
                 throw new \DomainException(
                     sprintf('Invalid session cache limiter value: %s', $value)
@@ -424,9 +425,10 @@ class Session implements \ArrayAccess, \Iterator {
     }
 
     public function offsetUnset($offset) {
-        if (!$this->open) {
+        if (!$this->isOpen) {
             $this->open();
         }
+
         if ($this->has($offset)) {
             unset($this->data[$offset]);
             $this->needsSave = TRUE;
