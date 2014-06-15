@@ -5,9 +5,9 @@ namespace Arya;
 use Auryn\Injector,
     Auryn\Provider,
     Auryn\InjectionException,
-    Arya\Sessions\Session;
-use FastRoute\Dispatcher;
-use FastRoute\RouteCollector;
+    Arya\Sessions\Session,
+    FastRoute\Dispatcher,
+    FastRoute\RouteCollector;
 
 class Application {
 
