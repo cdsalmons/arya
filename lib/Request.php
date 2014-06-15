@@ -299,7 +299,7 @@ class Request implements \ArrayAccess, \Iterator {
     }
 
     public function getBody() {
-        if (isset($this->body)) {
+        if ($this->body != "") {
             $body = $this->body;
         } elseif ($this->bodyStream) {
             $body = $this->bufferBodyStream();
