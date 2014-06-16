@@ -128,4 +128,10 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase {
         $response = self::$client->request($request);
         $this->assertEquals(405, $response->getStatus());
     }
+
+    public function testSubRoutes() {
+        $uri = self::$baseUri . '/sub/test';
+        $response = self::$client->request($uri);
+        $this->assertEquals("43", $response->getBody());
+    }
 }

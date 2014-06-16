@@ -3,7 +3,7 @@
 use Arya\Application,
     Arya\Request,
     Arya\Response,
-    Arya\Sessions\Session;
+    Arya\Routes;
 
 function testFunctionTarget() {
     return 'test';
@@ -83,24 +83,34 @@ function exceptionFunction() {
     throw new \Exception('test');
 }
 
+function beforeSub($request) {
+    $request['BEFORE_SUB_TEST'] = 43;
+}
 
+function subFunctionTarget($request) {
+    return (string) $request['BEFORE_SUB_TEST'];
+}
 
+$routes = (new Routes)
+    ->before('beforeSub')
+    ->route('GET', 'test', 'subFunctionTarget');
 
-
-$app = (new Application)
-    ->route('GET', '/test-function-target', 'testFunctionTarget')
-    ->route('GET', '/test-lambda-target', $lambda)
-    ->route('GET', '/test-static-target', 'TestStaticClass::get')
-    ->route('GET', '/test-instance-method-target', 'TestInstanceMethod::get')
-    ->route('GET', '/{arg1}/{arg2}/{arg3:\d+}', 'testRouteArgsFunctionTarget')
-    ->route('GET', '/generates-output', 'testGeneratesOutputFunctionTarget')
-    ->route('GET', '/complex-response', 'testComplexResponseFunctionTarget')
-    ->route('GET', '/zanzibar/test', 'testFunctionTarget')
-    ->route('GET', '/fatal', 'fatalFunction')
-    ->route('GET', '/exception', 'exceptionFunction')
-    ->route('GET', '/test-invalid-query-parameter-type', 'testInvalidQueryParameterType')
+(new Application)
+    ->setOption("app.debug", true)
+    ->route('GET', 'test-function-target', 'testFunctionTarget')
+    ->route('GET', 'test-lambda-target', $lambda)
+    ->route('GET', 'test-static-target', 'TestStaticClass::get')
+    ->route('GET', 'test-instance-method-target', 'TestInstanceMethod::get')
+    ->route('GET', '{arg1}/{arg2}/{arg3:\d+}', 'testRouteArgsFunctionTarget')
+    ->route('GET', 'generates-output', 'testGeneratesOutputFunctionTarget')
+    ->route('GET', 'complex-response', 'testComplexResponseFunctionTarget')
+    ->route('GET', 'zanzibar/test', 'testFunctionTarget')
+    ->route('GET', 'fatal', 'fatalFunction')
+    ->route('GET', 'exception', 'exceptionFunction')
+    ->route('GET', 'test-invalid-query-parameter-type', 'testInvalidQueryParameterType')
     ->before('beforeAll')
     ->after('afterAll')
     ->after('afterWithUriFilter', $options = array('uri' => '/zanzibar/*'))
+    ->addRoutes($routes, 'sub/')
     ->run()
 ;

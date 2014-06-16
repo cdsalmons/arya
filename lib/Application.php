@@ -9,18 +9,11 @@ use Auryn\Injector,
     FastRoute\Dispatcher,
     FastRoute\RouteCollector;
 
-class Application {
+class Application extends Routes {
 
     private $injector;
     private $request;
     private $response;
-    private $routes = [];
-
-    private $befores = array();
-    private $afters = array();
-    private $finalizers = array();
-    
-    private $canSerializeRoutes = TRUE;
 
     private $options = array(
         'app.debug' => NULL,
@@ -64,71 +57,6 @@ class Application {
     }
 
     /**
-     * Add a route handler
-     *
-     * @param string $httpMethod
-     * @param string $uri
-     * @param mixed $handler
-     * @return Application Returns the current object instance
-     */
-    public function route($httpMethod, $uri, $handler) {
-        $this->routes[] = [$httpMethod, $uri, $handler];
-
-        if ($handler instanceof \Closure) {
-            $this->canSerializeRoutes = FALSE;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Attach a "before" middleware
-     *
-     * @param mixed $middleware
-     * @param array $options
-     * @return Application Returns the current object instance
-     */
-    public function before($middleware, array $options = array()) {
-        $this->befores[] = $this->generateMiddlewareComponents($middleware, $options);
-
-        return $this;
-    }
-
-    private function generateMiddlewareComponents($middleware, array $options) {
-        $methodFilter = empty($options['method']) ? NULL : $options['method'];
-        $uriFilter = empty($options['uri']) ? NULL : $options['uri'];
-        $priority = isset($options['priority']) ? @intval($options['priority']) : 50;
-
-        return array($middleware, $methodFilter, $uriFilter, $priority);
-    }
-
-    /**
-     * Attach an "after" middleware
-     *
-     * @param mixed $middleware
-     * @param array $options
-     * @return Application Returns the current object instance
-     */
-    public function after($middleware, array $options = array()) {
-        $this->afters[] = $this->generateMiddlewareComponents($middleware, $options);
-
-        return $this;
-    }
-
-    /**
-     * Attach a "finalize" middleware
-     *
-     * @param mixed $middleware
-     * @param array $options
-     * @return Application Returns the current object instance
-     */
-    public function finalize($middleware, array $options = array()) {
-        $this->finalizers[] = $this->generateMiddlewareComponents($middleware, $options);
-
-        return $this;
-    }
-
-    /**
      * Respond to the client request
      *
      * The run method allows users to inject their own Arya\Request instance (which can be useful
@@ -139,6 +67,12 @@ class Application {
      * @return void
      */
     public function run(Request $request = NULL) {
+        foreach ($this->routes as &$route) {
+            if ($route[1][0] !== '/') {
+                $route[1] = "/$route[1]";
+            }
+        }
+
         $request = $request ?: $this->generateRequest();
         $response = new Response;
 
@@ -253,6 +187,10 @@ class Application {
     }
 
     private function matchesUriFilter($uriFilter, $uriPath) {
+        if ($uriFilter[0] != '/') {
+            $uriFilter = "/$uriFilter";
+        }
+
         if ($uriFilter === $uriPath) {
             $isMatch = TRUE;
         } elseif ($uriFilter[strlen($uriFilter) - 1] === '*'
@@ -500,7 +438,7 @@ class Application {
      *
      * @param array $options
      * @throws \DomainException
-     * @return Application Returns the current object instance
+     * @return static Returns the current object instance
      */
     public function setAllOptions(array $options) {
         foreach ($options as $option => $value) {
@@ -516,7 +454,7 @@ class Application {
      * @param string $option
      * @param mixed $value
      * @throws \DomainException
-     * @return Application Returns the current object instance
+     * @return static Returns the current object instance
      */
     public function setOption($option, $value) {
         if (isset($this->options[$option])) {
