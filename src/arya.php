@@ -51,7 +51,6 @@ register_shutdown_function(function() {
 
 if (defined('APPLICATION')) {
     require __DIR__ . '/bootstrap.php';
-    require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';
     require APPLICATION;
 } else {
     throw new RuntimeException(
