@@ -205,12 +205,9 @@ class Application {
     }
 
     private function generateRequest() {
-        $_input = !empty($_SERVER['CONTENT-LENGTH']) ? fopen('php://input', 'r') : NULL;
-        $request = new Request($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE, $_input);
+        $_input = empty($_SERVER['CONTENT-LENGTH']) ? NULL : fopen('php://input', 'r');
 
-        unset($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE);
-
-        return $request;
+        return new Request($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE, $_input);
     }
 
     private function middlewareSort(array $a, array $b) {
