@@ -54,7 +54,7 @@ class Application {
         if (isset($debug)) {
             $debug = (bool) $debug;
         } elseif (defined('DEBUG')) {
-            $debug = (bool) $debug;
+            $debug = (bool) DEBUG;
         } else {
             $debug = TRUE;
         }
