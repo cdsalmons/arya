@@ -17,7 +17,7 @@ $composerAutoloader = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($composerAutoloader)) {
     require $composerAutoloader;
 } else {
-    require __DIR__ . '/../vendor/Auryn/autoload.php';
+    require __DIR__ . '/../vendor/Auryn/src/bootstrap.php';
     require __DIR__ . '/../vendor/Artax/autoload.php';
     require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';
 }

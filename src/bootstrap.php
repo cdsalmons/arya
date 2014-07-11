@@ -7,5 +7,5 @@ spl_autoload_register(function($class) {
     }
 });
 
-require __DIR__ . '/../vendor/Auryn/autoload.php';
-require __DIR__ . '/../vendor/FastRoute/test/bootstrap.php';
+require __DIR__ . '/../vendor/Auryn/src/bootstrap.php';
+require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';

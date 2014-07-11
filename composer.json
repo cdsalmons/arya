@@ -13,7 +13,7 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "rdlowrey/auryn": "~0.12.0",
+    "rdlowrey/auryn": "~0.13.0",
     "nikic/fast-route": "dev-master"
   },
   "require-dev": {
