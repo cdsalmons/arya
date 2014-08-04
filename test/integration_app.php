@@ -101,6 +101,6 @@ $app = (new Application)
     ->route('GET', '/test-invalid-query-parameter-type', 'testInvalidQueryParameterType')
     ->before('beforeAll')
     ->after('afterAll')
-    ->after('afterWithUriFilter', $options = array('uri' => '/zanzibar/*'))
+    ->after('afterWithUriFilter', $options = ['uri' => '/zanzibar/*'])
     ->run()
 ;

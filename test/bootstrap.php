@@ -31,7 +31,7 @@ $serverCommand = sprintf(
 );
 
 // Start the web server and store the process ID so we can kill it when we're finished
-$output = array();
+$output = [];
 exec($serverCommand, $output);
 $pid = (int) $output[0];
 

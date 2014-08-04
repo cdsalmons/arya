@@ -83,7 +83,7 @@ class FileSessionHandler implements SessionHandler {
             $this->open($sessionId);
         }
 
-        return ($data = stream_get_contents($this->fileHandle)) ? unserialize($data) : array();
+        return ($data = stream_get_contents($this->fileHandle)) ? unserialize($data) : [];
     }
 
     public function write($sessionId, array $data) {

@@ -16,13 +16,13 @@ class Application {
     private $response;
     private $routes = [];
 
-    private $befores = array();
-    private $afters = array();
-    private $finalizers = array();
-    
+    private $befores = [];
+    private $afters = [];
+    private $finalizers = [];
+
     private $canSerializeRoutes = TRUE;
 
-    private $options = array(
+    private $options = [
         'app.debug' => NULL,
         'app.auto_reason' => TRUE,
         'app.allow_empty_response' => FALSE,
@@ -46,7 +46,7 @@ class Application {
         'session.gc_max_lifetime' => -100,
         'session.middleware_priority' => 20,
         'session.save_path' => NULL
-    );
+    ];
 
     public function __construct(Injector $injector = NULL, $debug = NULL) {
         $this->injector = $injector ?: new Provider;
@@ -88,7 +88,7 @@ class Application {
      * @param array $options
      * @return Application Returns the current object instance
      */
-    public function before($middleware, array $options = array()) {
+    public function before($middleware, array $options = []) {
         $this->befores[] = $this->generateMiddlewareComponents($middleware, $options);
 
         return $this;
@@ -99,7 +99,7 @@ class Application {
         $uriFilter = empty($options['uri']) ? NULL : $options['uri'];
         $priority = isset($options['priority']) ? @intval($options['priority']) : 50;
 
-        return array($middleware, $methodFilter, $uriFilter, $priority);
+        return [$middleware, $methodFilter, $uriFilter, $priority];
     }
 
     /**
@@ -109,7 +109,7 @@ class Application {
      * @param array $options
      * @return Application Returns the current object instance
      */
-    public function after($middleware, array $options = array()) {
+    public function after($middleware, array $options = []) {
         $this->afters[] = $this->generateMiddlewareComponents($middleware, $options);
 
         return $this;
@@ -122,7 +122,7 @@ class Application {
      * @param array $options
      * @return Application Returns the current object instance
      */
-    public function finalize($middleware, array $options = array()) {
+    public function finalize($middleware, array $options = []) {
         $this->finalizers[] = $this->generateMiddlewareComponents($middleware, $options);
 
         return $this;
@@ -154,12 +154,12 @@ class Application {
         $this->injector->share($response);
         $this->injector->share('Arya\Sessions\SessionMiddlewareProxy');
         $this->injector->alias('Arya\Sessions\Session', 'Arya\Sessions\SessionMiddlewareProxy');
-        $this->injector->define('Arya\Sessions\SessionMiddlewareProxy', array(
+        $this->injector->define('Arya\Sessions\SessionMiddlewareProxy', [
             ':app' => $this,
             ':request' => $request,
             ':priority' => $this->options['session.middleware_priority'],
             'handler' => $this->options['session.class']
-        ));
+        ]);
 
         $middlewareSort = [$this, 'middlewareSort'];
         usort($this->befores, $middlewareSort);
@@ -195,7 +195,7 @@ class Application {
                 $r->addRoute($httpMethod, $uri, $handler);
             }
         };
-        
+
         return $this->canSerializeRoutes
             ? \FastRoute\cachedDispatcher($callable, [
                 'cacheFile' => $this->options['routing.cache_file'],
@@ -265,10 +265,10 @@ class Application {
 
     private function tryMiddleware($executableMiddleware) {
         try {
-            $shouldStop = $this->injector->execute($executableMiddleware, array(
+            $shouldStop = $this->injector->execute($executableMiddleware, [
                 ':request' => $this->request,
                 ':response' => $this->response,
-            ));
+            ]);
 
             if ($shouldStop && $shouldStop !== TRUE) {
                 throw new \RuntimeException(
@@ -296,10 +296,10 @@ class Application {
     }
 
     private function applyExceptionResponse(\Exception $e) {
-        $this->response->importArray(array(
+        $this->response->importArray([
             'status' => 500,
             'body' => $this->generateExceptionBody($e)
-        ));
+        ]);
     }
 
     private function generateExceptionBody(\Exception $e) {
@@ -317,10 +317,10 @@ class Application {
 
         $body = "<html><body><h1>500 Internal Server Error</h1><hr/>{$msg}</body></html>";
 
-        $this->response->importArray(array(
+        $this->response->importArray([
             'status' => 500,
             'body' => $body
-        ));
+        ]);
     }
 
     private function routeRequest() {
@@ -388,18 +388,18 @@ class Application {
     }
 
     private function applyNotFoundResponse() {
-        $this->response->importArray(array(
+        $this->response->importArray([
             'status' => 404,
             'body' => '<html><body><h1>404 Not Found</h1></body></html>'
-        ));
+        ]);
     }
 
     private function applyMethodNotAllowedResponse(array $allowedMethods) {
-        $this->response->importArray(array(
+        $this->response->importArray([
             'status' => 405,
-            'headers' => array('Allow: ' . implode(',', $allowedMethods)),
+            'headers' => ['Allow: ' . implode(',', $allowedMethods)],
             'body' => '<html><body><h1>405 Method Not Allowed</h1></body></html>'
-        ));
+        ]);
     }
 
     private function applyBadUserInputResponse($errorMessage) {
@@ -566,9 +566,9 @@ class Application {
             );
         } else {
             $this->options['session.save_path'] = $value;
-            $this->injector->define('Arya\Sessions\FileSessionHandler', array(
+            $this->injector->define('Arya\Sessions\FileSessionHandler', [
                 ':dir' => $value
-            ));
+            ]);
         }
     }
 
