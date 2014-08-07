@@ -6,10 +6,10 @@ use Arya\Request;
 
 class Session implements \ArrayAccess, \Iterator {
 
-    const CACHE_NOCACHE = 'nocache';
-    const CACHE_PRIVATE = 'private';
-    const CACHE_PRIV_NO_EXP = 'private_no_expire';
-    const CACHE_PUBLIC = 'public';
+    const CACHE_NOCACHE = 'nocache',
+          CACHE_PRIVATE = 'private',
+          CACHE_PRIV_NO_EXP = 'private_no_expire',
+          CACHE_PUBLIC = 'public';
 
     private $request;
     private $handler;
