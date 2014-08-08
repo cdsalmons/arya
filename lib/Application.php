@@ -73,9 +73,10 @@ class Application {
      */
     public function route($httpMethod, $uri, $handler) {
         $this->routes[] = [$httpMethod, $uri, $handler];
-
-        if ($handler instanceof \Closure) {
-            $this->canSerializeRoutes = FALSE;
+        if($this->canSerializeRoutes) {
+            if($handler instanceof \Closure) {
+                $this->canSerializeRoutes = FALSE;
+            }
         }
 
         return $this;
