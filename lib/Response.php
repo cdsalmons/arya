@@ -107,12 +107,18 @@ class Response implements \ArrayAccess {
             $this->setCookieFromRawHeaderValue($value);
 
             return NULL;
-        } elseif (is_scalar($value)) {
-            $value = [$value];
+        } elseif (is_scalar($value) || is_null($value)) {
+            $value = [(string) $value];
         } elseif (!(is_array($value) && $this->isValidArrayHeader($value))) {
             throw new \InvalidArgumentException(
                 'Invalid header; scalar or one-dimensional array of scalars required'
             );
+        }
+
+        if (isset($this->ucHeaders[$ucField])) {
+            // There's already a case-insensitive match for this field name. Reuse the
+            // existing case mapping.
+            $field = $this->ucHeaders[$ucField];
         }
 
         $this->headers[$field] = $value;
