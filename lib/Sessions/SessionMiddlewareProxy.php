@@ -10,11 +10,11 @@ class SessionMiddlewareProxy extends Session {
     function __construct(Application $app, Request $request, SessionHandler $handler = NULL, $priority = 20) {
         parent::__construct($request, $handler);
 
-        $middlewareOptions = array(
+        $middlewareOptions = [
             'priority' => $priority,
             'uri' => $request['REQUEST_URI'],
             'method' => $request['REQUEST_METHOD']
-        );
+        ];
         $self = $this;
         $app->after(function($request, $response) use ($self) {
             if ($self->shouldSetCookie()) {

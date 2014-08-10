@@ -7,21 +7,21 @@ use Arya\Request;
 class RequestTest extends \PHPUnit_Framework_TestCase {
 
     private function getRequiredServerVars() {
-        $_server = array(
+        $_server = [
             'SERVER_PROTOCOL' => 'HTTP/1.0',
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/index.php',
             'REQUEST_URI_PATH' => '/index.php',
             'HTTPS' => 'off',
-        );
+        ];
 
-        $_get = array();
-        $_post = array();
-        $_files = array();
-        $_cookie = array();
+        $_get = [];
+        $_post = [];
+        $_files = [];
+        $_cookie = [];
         $_input = NULL;
 
-        return array($_server, $_get, $_post, $_files, $_cookie, $_input);
+        return [$_server, $_get, $_post, $_files, $_cookie, $_input];
     }
 
     public function testGeneral() {
@@ -45,19 +45,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertFalse($request->hasBody());
 
-        $expectedVars = array(
+        $expectedVars = [
             'SERVER_PROTOCOL' => '1.0',
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/index.php',
             'REQUEST_URI_PATH' => '/index.php',
             'HTTPS' => FALSE,
             'HTTP_MY_HEADER' => 'my value'
-        );
+        ];
         $this->assertSame($expectedVars, $request->all());
 
         $this->assertTrue($request->hasHeader('My-Header'));
         $this->assertSame('my value', $request->getHeader('My-Header'));
-        $this->assertSame(array('MY-HEADER' => 'my value'), $request->getAllHeaders());
+        $this->assertSame(['MY-HEADER' => 'my value'], $request->getAllHeaders());
     }
 
     public function testContentLength() {
@@ -180,7 +180,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetFormFile() {
         list($_server, $_get, $_post, $_files, $_cookie, $_input) = $this->getRequiredServerVars();
-        $_files = array('test' => 42);
+        $_files = ['test' => 42];
         $request = new Request($_server, $_get, $_post, $_files, $_cookie, $_input);
         $this->assertTrue($request->hasFormFile('test'));
         $this->assertEquals(42, $request->getFormFile('test'));
@@ -188,7 +188,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetAllFormFiles() {
         list($_server, $_get, $_post, $_files, $_cookie, $_input) = $this->getRequiredServerVars();
-        $files = array('test' => 42);
+        $files = ['test' => 42];
         $request = new Request($_server, $_get, $_post, $_files, $_cookie, $_input);
         $this->assertEquals($_files, $request->getAllFormFiles());
     }

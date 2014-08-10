@@ -6,19 +6,19 @@ use Arya\Request;
 
 class Session implements \ArrayAccess, \Iterator {
 
-    const CACHE_NOCACHE = 'nocache';
-    const CACHE_PRIVATE = 'private';
-    const CACHE_PRIV_NO_EXP = 'private_no_expire';
-    const CACHE_PUBLIC = 'public';
+    const CACHE_NOCACHE = 'nocache',
+          CACHE_PRIVATE = 'private',
+          CACHE_PRIV_NO_EXP = 'private_no_expire',
+          CACHE_PUBLIC = 'public';
 
     private $request;
     private $handler;
     private $sessionId;
-    private $data = array();
+    private $data = [];
     private $isOpen = FALSE;
     private $needsSave = FALSE;
     private $wasAltered = FALSE;
-    private $options = array(
+    private $options = [
         'cookie_name' => 'ASESSID',
         'cookie_domain' => '',
         'cookie_path' => '',
@@ -35,7 +35,7 @@ class Session implements \ArrayAccess, \Iterator {
         'gc_divisor' => 100,
         'gc_max_lifetime' => 1440,
         'strict' => TRUE
-    );
+    ];
 
     public function __construct(Request $request, SessionHandler $handler = NULL) {
         $this->request = $request;
@@ -390,7 +390,7 @@ class Session implements \ArrayAccess, \Iterator {
         if ($oldSessionId = $this->sessionId) {
             $this->handler->close();
             $this->handler->destroy($oldSessionId);
-            $this->data = array();
+            $this->data = [];
             $this->isOpen = FALSE;
         }
 
@@ -403,17 +403,17 @@ class Session implements \ArrayAccess, \Iterator {
     }
 
     public function getCookieElements() {
-        return array(
+        return [
             $this->options['cookie_name'],
             $this->sessionId,
-            array(
+            [
                 'domain' => $this->options['cookie_domain'],
                 'path' => $this->options['cookie_path'],
                 'expire' => $this->options['cookie_lifetime'],
                 'secure' => $this->options['cookie_secure'],
                 'httponly' => $this->options['cookie_httponly']
-            )
-        );
+            ]
+        ];
     }
 
     public function offsetSet($offset, $value) {

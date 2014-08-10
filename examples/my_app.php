@@ -43,10 +43,10 @@ function complexResponse(Request $request) {
     $response = (new Response)
         ->setHeader('X-My-Header', 'some-value')
         ->addHeader('X-My-Header', 'HTTP header fields can have multiple values!')
-        ->setAllHeaders(array(
+        ->setAllHeaders([
             'Header1' => 'header 1 value',
             'Header2' => 'header 2 value',
-        ))
+        ])
         ->setStatus(200)
         ->setReason('OK')
         ->setBody('<html><body><h1>Complex Response</h1></body></html>')

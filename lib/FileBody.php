@@ -5,7 +5,7 @@ namespace Arya;
 class FileBody implements Body {
 
     private $path;
-    private $options = array();
+    private $options = [];
 
     public function __construct($path) {
         if (!is_string($path)) {
@@ -44,9 +44,9 @@ class FileBody implements Body {
      * @TODO Add caching headers
      */
     public function getHeaders() {
-        return array(
+        return [
             'Content-Length' => filesize($this->path)
-        );
+        ];
     }
 
     /**

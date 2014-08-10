@@ -6,20 +6,20 @@ class Response implements \ArrayAccess {
 
     private $status = 200;
     private $reasonPhrase = '';
-    private $headers = array();
-    private $ucHeaders = array();
-    private $cookies = array();
+    private $headers = [];
+    private $ucHeaders = [];
+    private $cookies = [];
     private $body;
-    private $asgiMap = array();
-    private $cookieOptions = array(
+    private $asgiMap = [];
+    private $cookieOptions = [
         'expire' => 0,
         'path' => '',
         'domain' => '',
         'secure' => FALSE,
         'httponly' => FALSE
-    );
+    ];
 
-    public function __construct(array $map = array()) {
+    public function __construct(array $map = []) {
         foreach ($map as $key => $value) {
             $this->offsetSet($key, $value);
         }
@@ -264,7 +264,7 @@ class Response implements \ArrayAccess {
 
         $value = ltrim(substr($line, $fieldEndPosition + 1));
 
-        return array($field, $value);
+        return [$field, $value];
     }
 
     /**
@@ -281,8 +281,8 @@ class Response implements \ArrayAccess {
     public function addHeader($field, $value) {
         if ($this->hasHeader($field)) {
             $existing = $this->getHeader($field);
-            $existing = is_array($existing) ? $existing : array($existing);
-            $value = is_scalar($value) ? array($value) : $value;
+            $existing = is_array($existing) ? $existing : [$existing];
+            $value = is_scalar($value) ? [$value] : $value;
             $newHeaders = array_merge($existing, $value);
             $this->setHeader($field, $newHeaders);
         } else {
@@ -318,7 +318,7 @@ class Response implements \ArrayAccess {
         $ucField = strtoupper($field);
 
         if ($ucField === 'SET-COOKIE') {
-            $this->cookies = array();
+            $this->cookies = [];
         } elseif (isset($this->ucHeaders[$ucField])) {
             $field = $this->ucHeaders[$ucField];
             unset(
@@ -336,9 +336,9 @@ class Response implements \ArrayAccess {
      * @return Response Returns the current object instance
      */
     public function removeAllHeaders() {
-        $this->headers = array();
-        $this->ucHeaders = array();
-        $this->cookies = array();
+        $this->headers = [];
+        $this->ucHeaders = [];
+        $this->cookies = [];
 
         return $this;
     }
@@ -349,20 +349,20 @@ class Response implements \ArrayAccess {
      * Cookie values will be available upon the client's next request. Extended cookie options
      * beyond the name-value pair may be specified using individual keys in the $options array:
      *
-     *     array(
+     *     [
      *         'expire' => 0,       // Expiration time (unix timestamp) for this cookie
      *         'path' => '',        // The server path on which the cookie will be available
      *         'domain' => '',      // The domain on which the cookie will be available
      *         'secure' => FALSE,   // Indicates the cookie should only be sent via HTTPS
      *         'httponly' => FALSE  // When TRUE the cookie is only available via the HTTP protocol
-     *     );
+     *     ];
      *
      * @param string $name
      * @param string $value
      * @param array $options
      * @return Response Returns the current object instance
      */
-    public function setCookie($name, $value = '', array $options = array()) {
+    public function setCookie($name, $value = '', array $options = []) {
         $value = urlencode($value);
         $this->assignCookieHeader($name, $value, $options);
 
@@ -377,7 +377,7 @@ class Response implements \ArrayAccess {
      * @param array $options
      * @return Response Returns the current object instance
      */
-    public function setRawCookie($name, $value = '', array $options = array()) {
+    public function setRawCookie($name, $value = '', array $options = []) {
         $this->assignCookieHeader($name, $value, $options);
 
         return $this;
@@ -520,7 +520,7 @@ class Response implements \ArrayAccess {
      * @return array
      */
     public function getAllHeaderLines() {
-        $headers = array();
+        $headers = [];
         foreach ($this->getAllHeaders() as $field => $valueArray) {
             foreach ($valueArray as $value) {
                 $headers[] = "{$field}: $value";
@@ -582,12 +582,12 @@ class Response implements \ArrayAccess {
      *
      */
     public function toArray() {
-        return array_merge(array(
+        return array_merge([
             'status' => $this->status,
             'reason' => $this->reasonPhrase,
             'headers' => $this->getAllHeaderLines(),
             'body' => $this->body
-        ), $this->asgiMap);
+        ], $this->asgiMap);
     }
 
     /**
@@ -598,11 +598,11 @@ class Response implements \ArrayAccess {
     public function clear() {
         $this->status = 200;
         $this->reasonPhrase = '';
-        $this->headers = array();
-        $this->ucHeaders = array();
-        $this->cookies = array();
+        $this->headers = [];
+        $this->ucHeaders = [];
+        $this->cookies = [];
         $this->body = NULL;
-        $this->asgiMap = array();
+        $this->asgiMap = [];
 
         return $this;
     }
@@ -650,7 +650,7 @@ class Response implements \ArrayAccess {
                 $this->reasonPhrase = '';
                 break;
             case 'headers':
-                $this->headers = array();
+                $this->headers = [];
                 break;
             case 'body':
                 $this->body = NULL;

@@ -4,12 +4,12 @@ namespace Arya;
 
 class Request implements \ArrayAccess, \Iterator {
 
-    private $headers = array();
-    private $query = array();
-    private $form = array();
-    private $files = array();
-    private $cookies = array();
-    private $vars = array();
+    private $headers = [];
+    private $query = [];
+    private $form = [];
+    private $files = [];
+    private $cookies = [];
+    private $vars = [];
     private $bodyStream;
     private $body = "";
 
