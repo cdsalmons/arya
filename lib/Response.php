@@ -106,7 +106,7 @@ class Response implements \ArrayAccess {
         if ($ucField === 'SET-COOKIE') {
             $this->setCookieFromRawHeaderValue($value);
 
-            return NULL;
+            return $this;
         } elseif (is_scalar($value) || is_null($value)) {
             $value = [(string) $value];
         } elseif (!(is_array($value) && $this->isValidArrayHeader($value))) {
