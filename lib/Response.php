@@ -502,7 +502,7 @@ class Response implements \ArrayAccess {
     public function getAllHeaders() {
         $headers = $this->headers;
         if ($this->cookies) {
-            $headers['Set-Cookie'] = array_values($this->cookies);
+            $headers['SET-COOKIE'] = array_values($this->cookies);
         }
 
         return $headers;
