@@ -380,7 +380,8 @@ class Application {
         $result = $this->injector->execute($handler, $injectionLiterals);
 
         if ($result instanceof Response) {
-            $this->response->import($result);
+            $this->response = $result;
+            $this->injector->share($result);
         } elseif (is_array($result)) {
             $this->response->importArray($result);
         } elseif ($result) {
