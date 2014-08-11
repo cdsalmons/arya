@@ -479,7 +479,7 @@ class Response implements \ArrayAccess {
     /**
      * Assign a response entity body
      *
-     * @param string|callable|Body $body
+     * @param null|string|callable|Body $body
      * @throws \InvalidArgumentException
      * @return Response Returns the current object instance
      */
@@ -508,7 +508,7 @@ class Response implements \ArrayAccess {
     public function getAllHeaders() {
         $headers = $this->headers;
         if ($this->cookies) {
-            $headers['SET-COOKIE'] = array_values($this->cookies);
+            $headers['Set-Cookie'] = array_values($this->cookies);
         }
 
         return $headers;
