@@ -106,7 +106,7 @@ class Response implements \ArrayAccess {
         if ($ucField === 'SET-COOKIE') {
             $this->setCookieFromRawHeaderValue($value);
 
-            return NULL;
+            return $this;
         } elseif (is_scalar($value) || is_null($value)) {
             $value = [(string) $value];
         } elseif (!(is_array($value) && $this->isValidArrayHeader($value))) {
@@ -479,7 +479,7 @@ class Response implements \ArrayAccess {
     /**
      * Assign a response entity body
      *
-     * @param string|callable|Body $body
+     * @param null|string|callable|Body $body
      * @throws \InvalidArgumentException
      * @return Response Returns the current object instance
      */
