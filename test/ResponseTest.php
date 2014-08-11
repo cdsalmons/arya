@@ -75,7 +75,7 @@ class ResponseTest extends \PHPUNIT_Framework_TestCase {
     public function testGetAllHeaderIncludesCookiesInReturnValueIfSet() {
         $this->response->setCookie('Foo','bar');
         $this->assertSame(
-            $this->response->getAllHeaders()['SET-COOKIE'][0],
+            $this->response->getAllHeaders()['Set-Cookie'][0],
             'Foo=bar'
         );
     }
@@ -471,7 +471,7 @@ class ResponseTest extends \PHPUNIT_Framework_TestCase {
         $this->assertSame($content['status'], 201);
         $this->assertSame($content['reason'], 'Foo Found');
         $this->assertSame($content['headers'][0], 'Foo: Bar');
-        $this->assertSame($content['headers'][1], 'SET-COOKIE: Bar=Baz');
+        $this->assertSame($content['headers'][1], 'Set-Cookie: Bar=Baz');
         $this->assertSame($content['body'], 'Bar');
         $this->assertSame($content['asgiKey'], 'asgiValue');
     }
