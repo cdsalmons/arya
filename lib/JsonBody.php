@@ -10,7 +10,7 @@ class JsonBody implements Body {
         if (!$this->json = @json_encode($data, $flags, $depth)) {
             $errorCode = json_last_error();
             $errorMsg = function_exists('json_last_error_msg')
-                ? json_last_error_msg($errorCode)
+                ? json_last_error_msg()
                 : $this->jsonErrorMsg($errorCode);
             throw new \RuntimeException($errorMsg);
         }
