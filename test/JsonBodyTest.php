@@ -11,7 +11,7 @@ class JsonBodyTest extends \PHPUNIT_Framework_TestCase {
     }
 
     public function testFlagsArgumentIsInEffect() {
-        $jsonBody = new JsonBody(['foo' => '<p>bar</p>'], JSON_HEX_TAG);
+        $jsonBody = new JsonBody(['foo' => '<p>bar</p>'], \JSON_HEX_TAG);
         $this->assertSame(
             '{"foo":"\u003Cp\u003Ebar\u003C\/p\u003E"}',
             $this->getJsonBodyOutput($jsonBody)
