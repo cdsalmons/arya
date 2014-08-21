@@ -23,7 +23,7 @@ class JsonBodyTest extends \PHPUNIT_Framework_TestCase {
 
     /**
     * @expectedException \RuntimeException
-    * @expectedExceptionMessage Parameter depth not available in PHP 5.4
+    * @expectedExceptionMessage depth parameter not available before PHP 5.5
     */
     public function testThrowExceptionIfDepthParamIsNotAvailable() {
         if (PHP_VERSION_ID >= 50500) {
