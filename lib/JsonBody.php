@@ -7,6 +7,10 @@ class JsonBody implements Body {
     private $json;
 
     public function __construct($data, $flags = 0, $depth = 512) {
+        if(PHP_VERSION_ID < 50500 && $depth != 512) {
+            throw new \RuntimeException('depth parameter not available before PHP 5.5');
+        }
+
         if (!$this->json = @json_encode($data, $flags, $depth)) {
             $errorCode = json_last_error();
             $errorMsg = function_exists('json_last_error_msg')
