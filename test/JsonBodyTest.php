@@ -10,16 +10,18 @@ class JsonBodyTest extends \PHPUNIT_Framework_TestCase {
         $this->jsonBody = new JsonBody(['foo' => 'bar']);
     }
 
+    /**
+    * @requires PHP 5.5
+    */
     public function testFlagsArgumentIsInEffect() {
         $jsonBody = new JsonBody(['foo' => '<p>bar</p>'], \JSON_HEX_TAG);
-        $this->assertSame(
+        $this->assertJsonStringEqualsJsonString(
             '{"foo":"\u003Cp\u003Ebar\u003C\/p\u003E"}',
             $this->getJsonBodyOutput($jsonBody)
         );
     }
 
     /**
-    * @requires PHP 5.4
     * @expectedException \RuntimeException
     * @expectedExceptionMessage Parameter depth not available in PHP 5.4
     */
