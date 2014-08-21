@@ -19,6 +19,21 @@ class JsonBodyTest extends \PHPUNIT_Framework_TestCase {
     }
 
     /**
+    * @requires PHP 5.4
+    * @expectedException \RuntimeException
+    * @expectedExceptionMessage Parameter depth not available in PHP 5.4
+    */
+    public function testThrowExceptionIfDepthParamIsNotAvailable() {
+        if (PHP_VERSION_ID >= 50500) {
+            $this->markTestSkipped(
+              'depth is available since PHP 5.5'
+            );
+        }
+
+        $this->jsonBody = new JsonBody(['foo' => 'bar'], \JSON_HEX_TAG, 1024);
+    }
+
+    /**
     * @expectedException \RuntimeException
     * @expectedExceptionMessage Maximum stack depth exceeded
     */
