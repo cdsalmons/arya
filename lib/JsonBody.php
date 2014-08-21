@@ -11,7 +11,13 @@ class JsonBody implements Body {
             throw new \RuntimeException('depth parameter not available before PHP 5.5');
         }
 
-        if (!$this->json = @json_encode($data, $flags, $depth)) {
+        if(PHP_VERSION_ID < 50500) {
+            $this->json = @json_encode($data, $flags);
+        } else {
+            $this->json = @json_encode($data, $flags, $depth);
+        }
+
+        if (!$this->json) {
             $errorCode = json_last_error();
             $errorMsg = function_exists('json_last_error_msg')
                 ? json_last_error_msg()
