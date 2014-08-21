@@ -36,6 +36,7 @@ class JsonBodyTest extends \PHPUNIT_Framework_TestCase {
     }
 
     /**
+    * @requires PHP 5.5
     * @expectedException \RuntimeException
     * @expectedExceptionMessage Maximum stack depth exceeded
     */
