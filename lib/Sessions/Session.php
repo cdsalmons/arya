@@ -73,10 +73,10 @@ class Session implements \ArrayAccess, \Iterator {
             case 'cookie_secure':
                 $this->options['cookie_secure'] = (bool) $value;
                 break;
-            case 'cookie_http_only':
-                $this->options['cookie_http_only'] = (bool) $value;
+            case 'cookie_httponly':
+                $this->options['cookie_httponly'] = (bool) $value;
                 break;
-            case 'referer_check':
+            case 'check_referer':
                 $this->setRefererCheck($value);
                 break;
             case 'hash_function':
@@ -159,7 +159,7 @@ class Session implements \ArrayAccess, \Iterator {
 
     private function setRefererCheck($value) {
         if (is_string($value)) {
-            $this->options['referer_check'] = $value;
+            $this->options['check_referer'] = $value;
         } else {
             throw new \InvalidArgumentException(
                 sprintf(
