@@ -140,14 +140,14 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
     */
     public function testSetOptionSetRefererCheckThrowsInvalidArgumentExceptionIfValueIsNotString() {
         $session = $this->getBlackHoleSession();
-        $session->setOption('check_referer', [1,2,3]);
+        $session->setOption('referer_check', [1,2,3]);
     }
 
     public function testSetOptionCanSetRefererCheck() {
         $session = $this->getBlackHoleSession();
         $refererCheck = 'foo';
-        $session->setOption('check_referer', $refererCheck);
-        $this->assertSame($refererCheck, $session->getOption('check_referer'));
+        $session->setOption('referer_check', $refererCheck);
+        $this->assertSame($refererCheck, $session->getOption('referer_check'));
     }
 
     public function testSetOptionCanSetSha1HashFunction() {
@@ -332,7 +332,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
             'cookie_path' => '/',
             'cookie_secure' => TRUE,
             'cookie_httponly' => FALSE,
-            'check_referer' => 'Baz',
+            'referer_check' => 'Baz',
             'hash_function' => 'sha1',
             'cache_limiter' => 'public', // Session::CACHE_PUBLIC
             'cache_expire' => 240,
@@ -347,7 +347,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $this->assertSame('/', $session->getOption('cookie_path'));
         $this->assertTrue($session->getOption('cookie_secure'));
         $this->assertFalse($session->getOption('cookie_httponly'));
-        $this->assertSame('Baz', $session->getOption('check_referer'));
+        $this->assertSame('Baz', $session->getOption('referer_check'));
         $this->assertSame('sha1', $session->getOption('hash_function'));
         $this->assertSame('public', $session->getOption('cache_limiter'));
         $this->assertSame(240, $session->getOption('cache_expire'));
@@ -420,7 +420,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $fileSessionHandlerMock->expects($this->any())->method('save')->will($this->returnValue(True));
         $fileSessionHandlerMock->expects($this->any())->method('close')->will($this->returnValue(True));
         $session = new Session($requestMock, $fileSessionHandlerMock);
-        $session->setOption('check_referer', $referer);
+        $session->setOption('referer_check', $referer);
         $reflection = new \ReflectionClass($session);
         $reflectionSessionId = $reflection->getProperty('sessionId');
         $reflectionSessionId->setAccessible(True);
@@ -439,7 +439,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $reflection = new \ReflectionClass($session);
         $reflectionSessionId = $reflection->getProperty('sessionId');
         $reflectionSessionId->setAccessible(True);
-        $session->setOption('check_referer', 'foo.baz');
+        $session->setOption('referer_check', 'foo.baz');
         $session->open();
         $this->assertNotSame($requestSessionId, $reflectionSessionId->getValue($session));
     }
@@ -453,7 +453,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $reflection = new \ReflectionClass($session);
         $reflectionSessionId = $reflection->getProperty('sessionId');
         $reflectionSessionId->setAccessible(True);
-        $session->setOption('check_referer', 'foo.baz');
+        $session->setOption('referer_check', 'foo.baz');
         $session->open();
         $this->assertNotSame($requestSessionId, $reflectionSessionId->getValue($session));
     }
