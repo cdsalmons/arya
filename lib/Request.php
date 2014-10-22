@@ -219,7 +219,7 @@ class Request implements \ArrayAccess, \Iterator {
      * @param string $field
      * @return array
      */
-    public function getArrayFromField($field) {
+    public function getArrayFormField($field) {
         $value = $this->getFormField($field);
 
         if (is_array($value)) {
