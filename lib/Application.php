@@ -155,12 +155,9 @@ class Application {
         $this->injector->share($response);
         $this->injector->share('Arya\Sessions\SessionMiddlewareProxy');
         $this->injector->alias('Arya\Sessions\Session', 'Arya\Sessions\SessionMiddlewareProxy');
-        $this->injector->define('Arya\Sessions\SessionMiddlewareProxy', [
-            ':app' => $this,
-            ':request' => $request,
-            ':priority' => $this->options['session.middleware_priority'],
-            'handler' => $this->options['session.class']
-        ]);
+        $this->injector->delegate('Arya\Sessions\SessionMiddlewareProxy', function() use ($request) {
+            return $this->buildSessionMiddleware($request);
+        });
 
         $middlewareSort = [$this, 'middlewareSort'];
         usort($this->befores, $middlewareSort);
@@ -187,6 +184,33 @@ class Application {
         }
 
         $this->sendResponse();
+    }
+
+    private function buildSessionMiddleware(Request $request) {
+        $session = $this->injector->make('Arya\Sessions\SessionMiddlewareProxy', [
+            ':app' => $this,
+            ':request' => $request,
+            ':priority' => $this->options['session.middleware_priority'],
+            'handler' => $this->options['session.class']
+        ]);
+
+        $options = $this->options;
+        unset(
+            $options['session.middleware_priority'],
+            $options['session.class']
+        );
+
+        $sessionOptions = [];
+        foreach ($options as $option => $value) {
+            if (stripos($option, 'session.') === 0) {
+                $option = substr($option, 8);
+                $sessionOptions[$option] = $value;
+            }
+        }
+
+        $session->setAllOptions($sessionOptions);
+
+        return $session;
     }
 
     private function loadRouter() {
