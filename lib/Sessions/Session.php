@@ -25,7 +25,7 @@ class Session implements \ArrayAccess, \Iterator {
         'cookie_secure' => FALSE,
         'cookie_httponly' => TRUE,
         'cookie_lifetime' => 0,
-        'check_referer' => '',
+        'referer_check' => '',
         'entropy_length' => 1024,
         'entropy_file' => NULL,
         'hash_function' => NULL,
@@ -73,8 +73,8 @@ class Session implements \ArrayAccess, \Iterator {
             case 'cookie_secure':
                 $this->options['cookie_secure'] = (bool) $value;
                 break;
-            case 'cookie_http_only':
-                $this->options['cookie_http_only'] = (bool) $value;
+            case 'cookie_httponly':
+                $this->options['cookie_httponly'] = (bool) $value;
                 break;
             case 'referer_check':
                 $this->setRefererCheck($value);
@@ -220,7 +220,7 @@ class Session implements \ArrayAccess, \Iterator {
     }
 
     private function getExistingSessionIdFromRequest($cookieName) {
-        $checkReferer = $this->options['check_referer'];
+        $checkReferer = $this->options['referer_check'];
         if ($checkReferer && !$this->matchesRefererHeader($checkReferer)) {
             return NULL;
         }

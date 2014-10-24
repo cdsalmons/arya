@@ -509,7 +509,7 @@ class Application {
      * @return mixed
      */
     public function getOption($option) {
-        if (isset($this->options[$option])) {
+        if (array_key_exists($option, $this->options)) {
             return $this->options[$option];
         } else {
             throw new \DomainException(
@@ -542,7 +542,7 @@ class Application {
      * @return Application Returns the current object instance
      */
     public function setOption($option, $value) {
-        if (isset($this->options[$option])) {
+        if (array_key_exists($option, $this->options)) {
             $this->assignOptionValue($option, $value);
         } else {
             throw new \DomainException(
