@@ -35,7 +35,6 @@ class Application {
         'session.cookie_path' => '',
         'session.cookie_secure' => FALSE,
         'session.cookie_httponly' => TRUE,
-        'session.check_referer' => '',
         'session.entropy_length' => 1024,
         'session.entropy_file' => NULL,
         'session.hash_function' => NULL,
@@ -45,6 +44,7 @@ class Application {
         'session.gc_divisor' => 100,
         'session.gc_max_lifetime' => -100,
         'session.middleware_priority' => 20,
+        'session.referer_check' => '',
         'session.save_path' => NULL
     ];
 
