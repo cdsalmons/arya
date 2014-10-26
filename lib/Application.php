@@ -192,21 +192,17 @@ class Application {
         $session = new Sessions\SessionMiddlewareProxy($this, $request, $handler, $priority);
 
         $options = $this->options;
+
         unset(
             $options['session.middleware_priority'],
-            $options['session.class']
+            $options['session.class'],
+            $options['session.save_path']
         );
 
         $sessionOptions = [];
         foreach ($options as $option => $value) {
             if (stripos($option, 'session.') === 0) {
                 $option = substr($option, 8);
-                
-                if($option === 'save_path' || $option === 'class') {
-                    // handled separately
-                    continue;
-                }
-                
                 $sessionOptions[$option] = $value;
             }
         }
