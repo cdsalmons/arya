@@ -189,7 +189,7 @@ class Application {
     private function buildSessionMiddleware(Request $request) {
         $handler = $this->injector->make($this->options['session.class']);
         $priority = $this->options['session.middleware_priority'];
-        $session = new Arya\Sessions\SessionMiddlewareProxy($this, $request, $handler, $priority);
+        $session = new Sessions\SessionMiddlewareProxy($this, $request, $handler, $priority);
 
         $options = $this->options;
         unset(
