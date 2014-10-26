@@ -19,21 +19,21 @@ class Session implements \ArrayAccess, \Iterator {
     private $needsSave = FALSE;
     private $wasAltered = FALSE;
     private $options = [
-        'cookie_name' => 'ASESSID',
-        'cookie_domain' => '',
-        'cookie_path' => '',
-        'cookie_secure' => FALSE,
-        'cookie_httponly' => TRUE,
-        'cookie_lifetime' => 0,
-        'referer_check' => '',
-        'entropy_length' => 1024,
-        'entropy_file' => NULL,
-        'hash_function' => NULL,
         'cache_limiter' => self::CACHE_NOCACHE,
         'cache_expire' => 180,
+        'cookie_domain' => '',
+        'cookie_httponly' => TRUE,
+        'cookie_lifetime' => 0,
+        'cookie_name' => 'ASESSID',
+        'cookie_path' => '',
+        'cookie_secure' => FALSE,
+        'entropy_length' => 1024,
+        'entropy_file' => NULL,
         'gc_probability' => 1,
         'gc_divisor' => 100,
         'gc_max_lifetime' => 1440,
+        'hash_function' => NULL,
+        'referer_check' => '',
         'strict' => TRUE
     ];
 
@@ -87,6 +87,12 @@ class Session implements \ArrayAccess, \Iterator {
                 break;
             case 'cache_expire':
                 $this->options['cache_expire'] = @intval($value) ?: 180;
+                break;
+            case 'entropy_length':
+                $this->options['entropy_length'] = @intval($value) ?: 1024;
+                break;
+            case 'entropy_file':
+                $this->options['entropy_file'] = is_string($value) ? $value : NULL;
                 break;
             case 'gc_probability':
                 $this->options['gc_probability'] = @intval($value) ?: 1;
