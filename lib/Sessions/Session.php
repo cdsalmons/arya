@@ -177,20 +177,24 @@ class Session implements \ArrayAccess, \Iterator {
     }
 
     private function setHashFunction($value) {
-        $lcValue = strtolower($value);
-
-        switch ($lcValue) {
-            case 'md5': break;
-            case 'sha1': break;
-            default:
-                if (!(extension_loaded('hash') && in_array($lcValue, hash_algos()))) {
-                    throw new \DomainException(
-                        sprintf('Unkown session hash algo: %s', $value)
-                    );
-                }
+        if(is_null($value)) {
+            $this->options['hash_function'] = $value;
+        } else {
+            $lcValue = strtolower($value);
+    
+            switch ($lcValue) {
+                case 'md5': break;
+                case 'sha1': break;
+                default:
+                    if (!(extension_loaded('hash') && in_array($lcValue, hash_algos()))) {
+                        throw new \DomainException(
+                            sprintf('Unkown session hash algo: %s', $value)
+                        );
+                    }
+            }
+    
+            $this->options['hash_function'] = $lcValue;
         }
-
-        $this->options['hash_function'] = $lcValue;
     }
 
     private function setCacheLimiter($value) {
