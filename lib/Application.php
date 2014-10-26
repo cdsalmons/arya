@@ -201,6 +201,12 @@ class Application {
         foreach ($options as $option => $value) {
             if (stripos($option, 'session.') === 0) {
                 $option = substr($option, 8);
+                
+                if($option === 'save_path' || $option === 'class') {
+                    // handled separately
+                    continue;
+                }
+                
                 $sessionOptions[$option] = $value;
             }
         }
