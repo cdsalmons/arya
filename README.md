@@ -94,7 +94,14 @@ If you have an older version of Apache you should instead add this block to your
 ```
 
 #### Nginx
-@TODO
+```
+server {
+  ...
+  index front_controller.php;
+  try_files $uri $uri/ /front_controller.php;
+  ...
+}
+```
 
 #### PHP Server
 
