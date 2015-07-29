@@ -17,7 +17,7 @@ class StaticExampleClass {
     public static function staticMethod(Request $request) {
         $msg = 'Hello from StaticExampleClass::staticMethod()';
         $body = sprintf("<html><body><h1>%s</h1</body></html>", $msg);
-        return new Response($body, $status = 200);
+        return new Response(["body" => $body, "status" => 200]);
     }
 }
 
