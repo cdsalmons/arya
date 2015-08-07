@@ -100,8 +100,8 @@ class Session implements \ArrayAccess, \Iterator {
             case 'gc_divisor':
                 $this->options['gc_divisor'] = @intval($value) ?: 100;
                 break;
-            case 'gc_max_lifetime':
-                $this->options['gc_max_lifetime'] = @intval($value) ?: 1440;
+            case 'gc_maxlifetime':
+                $this->options['gc_maxlifetime'] = @intval($value) ?: 1440;
                 break;
             case 'strict':
                 $this->options['strict'] = (bool) $value;
@@ -237,7 +237,7 @@ class Session implements \ArrayAccess, \Iterator {
 
         $sessionId = $this->request->getCookie($cookieName);
         $isStrict = $this->options['strict'];
-        $maxAge = $this->options['gc_max_lifetime'];
+        $maxAge = $this->options['gc_maxlifetime'];
 
         return (!$isStrict || $this->handler->exists($sessionId, $maxAge))
             ? $sessionId
@@ -391,7 +391,7 @@ class Session implements \ArrayAccess, \Iterator {
         $gcDivisor = $this->options['gc_divisor'];
         $max = (int) ($gcDivisor / $gcProbability);
         if (rand(1, $max) === 1) {
-            $maxLifetime = $this->options['gc_max_lifetime'];
+            $maxLifetime = $this->options['gc_maxlifetime'];
             $this->handler->gc($maxLifetime);
         }
     }
