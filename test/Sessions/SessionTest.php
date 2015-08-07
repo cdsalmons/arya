@@ -285,25 +285,25 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
 
     public function testSetOptionSetGarbageMaxLifeTimeDefaultTo1440IfvalueFalseOrNullorZero() {
         $session = $this->getBlackHoleSession();
-        $session->setOption('gc_max_lifetime', Null);
-        $this->assertSame(1440, $session->getOption('gc_max_lifetime'));
+        $session->setOption('gc_maxlifetime', Null);
+        $this->assertSame(1440, $session->getOption('gc_maxlifetime'));
         $session->setOption('gc_max_lifetime', False);
-        $this->assertSame(1440, $session->getOption('gc_max_lifetime'));
-        $session->setOption('gc_max_lifetime', 0);
-        $this->assertSame(1440, $session->getOption('gc_max_lifetime'));
+        $this->assertSame(1440, $session->getOption('gc_maxlifetime'));
+        $session->setOption('gc_maxlifetime', 0);
+        $this->assertSame(1440, $session->getOption('gc_maxlifetime'));
     }
 
     public function testSetOptionSetGarbageMaxLifeTimeFormatsToInteger() {
         $session = $this->getBlackHoleSession();
-        $session->setOption('gc_max_lifetime', '123');
-        $this->assertSame(123, $session->getOption('gc_max_lifetime'));
+        $session->setOption('gc_maxlifetime', '123');
+        $this->assertSame(123, $session->getOption('gc_maxlifetime'));
     }
 
     public function testSetOptionCanSetGarbageMaxLifeTime() {
         $session = $this->getBlackHoleSession();
         $gcProbability = 42;
-        $session->setOption('gc_max_lifetime', $gcProbability);
-        $this->assertSame($gcProbability, $session->getOption('gc_max_lifetime'));
+        $session->setOption('gc_maxlifetime', $gcProbability);
+        $this->assertSame($gcProbability, $session->getOption('gc_maxlifetime'));
     }
 
     public function testSetOptionSetStrictFlagCastsValueToBool() {
@@ -338,7 +338,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
             'cache_expire' => 240,
             'gc_probability' => 2,
             'gc_divisor' => 420,
-            'gc_max_lifetime' => 608,
+            'gc_maxlifetime' => 608,
             'strict' => FALSE
         ];
         $session->setAllOptions($options);
@@ -353,7 +353,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $this->assertSame(240, $session->getOption('cache_expire'));
         $this->assertSame(2, $session->getOption('gc_probability'));
         $this->assertSame(420, $session->getOption('gc_divisor'));
-        $this->assertSame(608, $session->getOption('gc_max_lifetime'));
+        $this->assertSame(608, $session->getOption('gc_maxlifetime'));
         $this->assertFalse($session->getOption('strict'));
     }
 
@@ -554,7 +554,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $session->set('Foo', 'Bar');
         $session->setOption('gc_divisor', 1); // 100% chance of gc
         $session->setOption('gc_probability', 1);
-        $session->setOption('gc_max_lifetime', 50);
+        $session->setOption('gc_maxlifetime', 50);
         $session->open();
         $session->close();
     }
