@@ -287,7 +287,7 @@ class SessionTest extends \PHPUNIT_Framework_TestCase {
         $session = $this->getBlackHoleSession();
         $session->setOption('gc_maxlifetime', Null);
         $this->assertSame(1440, $session->getOption('gc_maxlifetime'));
-        $session->setOption('gc_max_lifetime', False);
+        $session->setOption('gc_maxlifetime', False);
         $this->assertSame(1440, $session->getOption('gc_maxlifetime'));
         $session->setOption('gc_maxlifetime', 0);
         $this->assertSame(1440, $session->getOption('gc_maxlifetime'));
