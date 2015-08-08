@@ -42,7 +42,7 @@ class Application {
         'session.cache_expire' => 180,
         'session.gc_probability' => 1,
         'session.gc_divisor' => 100,
-        'session.gc_max_lifetime' => 1440,
+        'session.gc_maxlifetime' => 1440,
         'session.middleware_priority' => 20,
         'session.referer_check' => '',
         'session.save_path' => NULL
