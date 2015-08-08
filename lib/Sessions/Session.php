@@ -31,7 +31,7 @@ class Session implements \ArrayAccess, \Iterator {
         'entropy_file' => NULL,
         'gc_probability' => 1,
         'gc_divisor' => 100,
-        'gc_max_lifetime' => 1440,
+        'gc_maxlifetime' => 1440,
         'hash_function' => NULL,
         'referer_check' => '',
         'strict' => TRUE
