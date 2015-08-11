@@ -4,7 +4,7 @@ namespace Arya\Test;
 
 use Arya\JsonBody;
 
-class JsonBodyTest extends \PHPUNIT_Framework_TestCase {
+class JsonBodyTest extends \PHPUnit_Framework_TestCase {
 
     public function setup() {
         $this->jsonBody = new JsonBody(['foo' => 'bar']);

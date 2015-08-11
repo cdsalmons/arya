@@ -4,7 +4,7 @@ namespace Arya\Test;
 
 use Arya\Sessions\Session;
 
-class SessionTest extends \PHPUNIT_Framework_TestCase {
+class SessionTest extends \PHPUnit_Framework_TestCase {
 
     public function testConstructorDefaultsSecondsArgumentsIfNullToInstanceOfFileSessionHandler() {
         $session = $this->getBlackHoleSession();

@@ -4,7 +4,7 @@ namespace Arya\Test;
 
 use Arya\FileBody;
 
-class JsonFileBodyTest extends \PHPUNIT_Framework_TestCase {
+class JsonFileBodyTest extends \PHPUnit_Framework_TestCase {
 
     private  $fileBody;
 

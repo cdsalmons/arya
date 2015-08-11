@@ -49,7 +49,7 @@ class Application {
     ];
 
     public function __construct(Injector $injector = NULL, $debug = NULL) {
-        $this->injector = $injector ?: new Provider;
+        $this->injector = $injector ?: new Injector;
 
         if (isset($debug)) {
             $debug = (bool) $debug;

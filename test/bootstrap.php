@@ -1,26 +1,9 @@
 <?php
 
 error_reporting(E_ALL);
-
 date_default_timezone_set(ini_get('date.timezone') ?: 'UTC');
 
-spl_autoload_register(function($class) {
-    if (strpos($class, 'Arya\\') === 0) {
-        $dir = strcasecmp(substr($class, -4), 'Test') ? 'lib/' : 'test/';
-        $name = substr($class, strlen('Arya'));
-        require __DIR__ . '/../' . $dir . strtr($name, '\\', DIRECTORY_SEPARATOR) . '.php';
-    }
-});
-
-$composerAutoloader = __DIR__ . '/../vendor/autoload.php';
-
-if (file_exists($composerAutoloader)) {
-    require $composerAutoloader;
-} else {
-    require __DIR__ . '/../vendor/Auryn/src/bootstrap.php';
-    require __DIR__ . '/../vendor/Artax/autoload.php';
-    require __DIR__ . '/../vendor/FastRoute/src/bootstrap.php';
-}
+require __DIR__ . '/../vendor/autoload.php';
 
 $serverCommand = sprintf(
     '%s -S %s:%d %s >/dev/null 2>&1 & echo $!',

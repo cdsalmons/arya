@@ -4,7 +4,7 @@ namespace Arya\Test;
 
 use Arya\Response;
 
-class ResponseTest extends \PHPUNIT_Framework_TestCase {
+class ResponseTest extends \PHPUnit_Framework_TestCase {
 
     private $response;
 
@@ -80,11 +80,18 @@ class ResponseTest extends \PHPUNIT_Framework_TestCase {
         );
     }
 
-    /**
-    * @expectedException PHPUnit_Framework_Error
-    */
     public function testSetAllHeadersFirstArgumentMustBeArray() {
-        $this->response->setAllHeaders();
+        try {
+            $this->response->setAllHeaders();
+        } catch (\PHPUnit_Framework_Error $e) {
+            $this->assertTrue(true);
+            return;
+        } catch (\TypeError $e) {
+            $this->assertTrue(true);
+            return;
+        }
+
+        $this->fail();
     }
 
     public function testSetAllHeadersIsChainable() {
@@ -193,11 +200,18 @@ class ResponseTest extends \PHPUNIT_Framework_TestCase {
         $this->assertSame($response, $this->response);
     }
 
-    /**
-    * @expectedException PHPUnit_Framework_Error
-    */
     public function testSetAllHeaderLinesArgumentMustBeArray() {
-        $this->response->setAllHeaderLines(1);
+        try {
+            $this->response->setAllHeaderLines(1);
+        } catch (\PHPUnit_Framework_Error $e) {
+            $this->assertTrue(true);
+            return;
+        } catch (\TypeError $e) {
+            $this->assertTrue(true);
+            return;
+        }
+
+        $this->fail();
     }
 
     public function testAddAllHeaderLinesLeftTrimsFieldValue() {
