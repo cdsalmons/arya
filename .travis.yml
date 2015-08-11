@@ -1,4 +1,5 @@
 language: php
+sudo: false
 before_install:
   - composer install
 php:
