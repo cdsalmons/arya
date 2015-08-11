@@ -1,4 +1,4 @@
-# Arya [![Travis Build](https://api.travis-ci.org/rdlowrey/Arya.png?branch=master)](https://travis-ci.org/rdlowrey/Arya)
+# Arya [![Travis Build](https://api.travis-ci.org/rdlowrey/arya.png?branch=master)](https://travis-ci.org/rdlowrey/arya)
 
 Arya is a minimalist PHP web SAPI framework providing URI routing, dependency injection and
 middleware hooks. The framework leverages HTTP protocol adherence and SOLID design principles to
