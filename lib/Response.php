@@ -148,7 +148,9 @@ class Response implements \ArrayAccess {
         $nvPair = array_shift($parts);
 
         if (strpos($nvPair, '=') === FALSE) {
-            throw new \InvalidArgumentException;
+            throw new \InvalidArgumentException(
+                'Invalid cookie string, must contain at least one "="'
+            );
         }
 
         list($name, $value) = explode('=', $nvPair, 2);
