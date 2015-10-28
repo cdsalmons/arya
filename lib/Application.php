@@ -144,8 +144,8 @@ class Application {
         $response = new Response;
 
         if ($this->options['app.auto_urldecode']) {
-            $request['REQUEST_URI'] = urldecode($request['REQUEST_URI']);
-            $request['REQUEST_URI_PATH'] = urldecode($request['REQUEST_URI_PATH']);
+            $request['REQUEST_URI'] = rawurldecode($request['REQUEST_URI']);
+            $request['REQUEST_URI_PATH'] = rawurldecode($request['REQUEST_URI_PATH']);
         }
 
         $this->request = $request;
